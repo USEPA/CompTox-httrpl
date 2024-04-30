@@ -1,0 +1,49 @@
+{
+"schema_httr_counts" : {
+    "type": "object",
+    "required": [ "sample_id", "raw_id", "aln_cmd", "host_name", "run_time", "probe_cnts", "n_reads", "n_reads_mapd", "n_reads_ambig", "mapd_frac" ],
+    "properties": {
+        "sample_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "raw_id": {
+            "description": "must be a string and is required"
+        },
+        "aln_cmd": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "host_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "run_time": {
+            "description": "must be a string and is required"
+        },
+        "probe_cnts": {
+            "type" : "object",
+            "properties" : {
+                "probe_name" : {"type" : "string"},
+                "counts" : {"type" : "integer"}
+            }
+        },
+        "n_reads": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "n_reads_mapd": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "n_reads_ambig": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "mapd_frac": {
+            "type": "number",
+            "description": "must be a string and is required"
+        }
+    }
+}
+}

@@ -1,0 +1,33 @@
+{"TC00283209_E07_2":{
+    "fastq": "TC00283209_E07.fastq_2",
+    "md5": "8bd0ada4073f3a6538b0ce68a1f813a1",
+    "path": "data/httrpl_automationTestData/lionel_fastq",
+    "qc_flag": "OK",
+    "rd_len": 50,
+    "read_grps": [
+        {
+            "flowcell_id": "CB4CYANXX",
+            "ins_id": "D00572",
+            "lane_num": 1,
+            "n_reads": 100000,
+            "run_id": "278"
+        }
+    ],
+    "sample_id": "TC00283209_E07_2"
+},"TC00283171_H13_2":{
+    "fastq": "TC00283171_H13.fastq_2",
+    "md5": "8fd566d5382d115fbb90c411e92955eb",
+    "path": "data/httrpl_automationTestData/lionel_fastq",
+    "qc_flag": "OK",
+    "rd_len": 50,
+    "read_grps": [
+        {
+            "flowcell_id": "CB6A8ANXX",
+            "ins_id": "D00572",
+            "lane_num": 1,
+            "n_reads": 100000,
+            "run_id": "277"
+        }
+    ],
+    "sample_id": "TC00283171_H13_2"
+}}

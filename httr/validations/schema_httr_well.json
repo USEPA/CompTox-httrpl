@@ -1,0 +1,168 @@
+{
+"schema_httr_well" : {
+    "type": "object",
+    "required": [ "trt_id", "counts_id", "raw_id", "qc_id", "sample_id", "plate_id", "well_id", "trt_name", "n_reads", "probe_cnts", "probe_cnts_nrm", "n_reads_mapd", "mapd_frac", "bad_probe_count", "n_cov5", "n_sig80", "top10_prop", "gini_coef", "qc_flag" ],
+    "optional": [ "stype", "media", "timeh", "rna_src", "chem_id", "conc", "conc_unit", "dose_level", "block_id", "pg_id", "culture_id", "cell_type", "replicate_num", "conc_analytical", "conc_analytical_unit", "cell_cru", "exper_date", "replicate_id" ],
+    "properties": {
+        "trt_id": {
+            "description": "must be a string and is required"
+        },
+        "counts_id": {
+            "description": "must be a string and is required"
+        },
+        "raw_id": {
+           "description": "must be a string and is required"
+        },
+        "qc_id": {
+            "description": "must be a string and is required"
+        },
+        "sample_id": {
+            "type" : "string",
+            "description": "must be a string and is required"
+        },
+        "plate_id": {
+            "type" : "string",
+            "description": "must be a string and is required"
+        },
+        "well_id": {
+            "type" : "string",
+            "description": "must be a string and is required"
+        },
+        "trt_name": {
+            "type" : "string",
+            "description": "must be a string and is required"
+        },
+        "n_reads": {
+            "type" : "integer",
+            "description": "must be a string and is required"
+        },
+        "probe_cnts": {
+            "type" : "object",
+            "properties" : {
+                "probe_name" : {
+                    "type" : "string"
+                },
+                "counts" : {
+                    "type" : "integer"
+                }
+            }
+        },
+        "probe_cnts_nrm": {
+            "type" : "object",
+            "properties" : {
+                "probe_name" : {
+                    "type" : "string"
+                },
+                "counts" : {
+                    "type" : "number"
+                }
+            }
+        },
+        "n_reads_mapd": {
+            "type" : "integer",
+            "description": "must be a string and is required"
+        },
+        "mapd_frac": {
+            "type" : "number",
+            "description": "must be a string and is required"
+        },
+        "bad_probe_count": {
+            "type" : "integer",
+            "description": "must be a string and is required"
+        },
+        "n_cov5": {
+            "type" : "integer",
+            "description": "must be a string and is required"
+        },
+        "n_sig80": {
+            "type" : "integer",
+            "description": "must be a string and is required"
+        },
+        "top10_prop": {
+            "type" : "number",
+            "description": "must be a string and is required"
+        },
+        "gini_coef": {
+            "type" : "number",
+            "description": "must be a string and is required"
+        },
+        "qc_flag": {
+            "type" : "string",
+            "description": "must be a string and is required"
+        },
+        "stype": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "media": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "timeh": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "rna_src": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "chem_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "conc": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "conc_unit": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "dose_level": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "block_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "pg_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "culture_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "cell_type": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+       "replicate_num": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+       "conc_analytical": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+       "conc_analytical_unit": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+       "cell_cru": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+       "exper_date": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+       "replicate_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        }
+    }
+}
+}
+

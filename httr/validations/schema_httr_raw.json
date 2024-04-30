@@ -1,0 +1,59 @@
+{
+"schema_httr_raw" : {
+    "type": "object",
+    "required": [ "path", "fastq", "sample_id", "mtime", "md5", "rd_len", "qc_flag" ],
+    "properties": {
+        "path": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "fastq": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "sample_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "mtime": {
+            "description": "must be a string and is required"
+        },
+        "md5": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "rd_len": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "qc_flag": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "read_grps":{
+             "type": "array",
+             "items": {
+                 "type" : "object",
+                 "properties" : {
+                     "ins_id" : {
+                         "type" : "string"
+                     },
+                     "run_id" : {
+                         "type" : "string"
+                     },
+                     "flowcell_id" :{
+                         "type" : "string"
+                     },
+                     "lane_num" :{
+                         "type" : "integer"
+                     },
+                     "n_reads" : {
+                         "type" : "integer"
+                     }                     
+                 }
+             }
+         }
+    }
+}
+}
+

@@ -1,0 +1,3 @@
+sample_id,plate_id,well_id,trt_name,qc_flag,stype,media,timeh,rna_src,chem_id,conc,conc_unit,dose_level,block_id,pg_id,culture_id,fq_file
+TC00283209_E07_2,TC00283209,E07,TP0001651G03_2_0.100000uM_DMEM_6h,OK,test sample,DMEM,6,Plated Cells,TP0001651G03,0.1,uM,2,P,A,c2016-11-29,"TC00283209_E07.fastq_2"
+TC00283171_H13_2,TC00283151,C16,TP0001651D01_2_0.100000uM_DMEM_6h,OK,test sample,DMEM,6,Plated Cells,TP0001651D01,0.1,uM,2,P,A,c2016-11-25,"TC00283171_H13.fastq_2"

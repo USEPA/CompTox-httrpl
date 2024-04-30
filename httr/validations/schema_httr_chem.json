@@ -1,0 +1,29 @@
+{
+"schema_httr_chem" : {
+    "type": "object",
+    "required": [ "chem_id", "chem_name", "dtxsid" ],
+    "optional": [ "casrn", "bottle_id" ],
+    "properties": {
+        "chem_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "chem_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "dtxsid": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "casrn": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+         "bottle_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        }
+    }
+}
+}

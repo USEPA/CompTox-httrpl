@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  httr:
+    user: ${UID}
+    volumes:      
+      - ${PWD}/httr/scripts:/httr/scripts
+      - ${PWD}/httr/lib:/httr/lib
+      - ${PWD}/httr/Rlib:/httr/Rlib
+      - ${PWD}/httr/tests/tests:/httr/tests/tests
+      - ${PWD}/httr/data/httrpl_automationTestData/config:/httr/data/httrpl_automationTestData/config
+      

@@ -1,0 +1,169 @@
+{
+"schema_httr_study" : {
+    "type": "object",
+    "required": [ "study_id", "study_name", "study_desc", "study_probe", "study_well", "study_trt_grp_cmp", "study_degs", "tech",
+                "times_hr", "max_dose_level", "media", "cell_types", "chem_ids", "nreps", "bs_assay_id", "assay_name", "platform_name",
+                "platform_ver", "atten_type", "probe_source_file", "probe_source_date", "probe_source_rcv", "probe_ncct_file",
+                "probe_ncct_date", "fasta_file", "anno_type", "anno_date", "qc_groups" ],
+    "properties": {
+        "study_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "study_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "study_desc": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "study_probe": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "study_well": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "study_trt_grp_cmp":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "study_degs":{
+            "type": "string",
+            "description": "must be a string and is required"
+        }, 
+        "src":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "tech":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "times_hr":{
+            "type": "array",
+            "items": {
+                "type" : "integer"
+            }            
+        },
+        "max_dose_level":{
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "media":{
+            "type": "array",
+            "items": {
+                "type" : "string"
+            } 
+        },
+        "cell_types":{
+            "type": "array",
+            "items": {
+                "type" : "string"
+            } 
+        },
+        "chem_ids":{
+            "type": "array",
+            "items": {
+                "type" : "string"
+            } 
+        },
+        "nreps":{
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "bs_assay_id":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "assay_name":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "platform_name":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "platform_ver":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "atten_type":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "probe_source_file":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "probe_source_date":{
+            "description": "must be a date and is required"
+        },
+        "probe_source_rcv":{
+            "description": "must be a date and is required"
+        },
+        "probe_ncct_file":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "probe_ncct_date":{
+            "description": "must be a date and is required"
+        },
+        "fasta_file":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "anno_type":{
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "anno_date":{
+            "description": "must be a date and is required"
+        },
+        "qc_groups":{
+             "type": "array",
+             "items": {
+                 "type" : "object",
+                 "properties" : {
+                     "sample_query" : {"type" : "string"}
+                 },             
+                 "type" : "object",
+                 "properties" : {
+                     "qc_thresholds": {
+                         "type": "object",
+                         "required": [ "min_mapd_frac", "min_n_reads_mapd", "min_n_sig80", "min_n_cov5", "max_gini_coef", "max_top10_prop" ],
+                         "properties": {
+                             "min_mapd_frac" : {
+                                 "type": "number",
+                                 "description": "must be number"
+                             },
+                             "min_n_reads_mapd" : {
+                                 "type": "integer",
+                                 "description": "must be number"
+                             },
+                             "min_n_sig80" : {
+                                 "type": "integer",
+                                 "description": "must be number"
+                             },
+                             "min_n_cov5" : {
+                                 "type": "integer",
+                                 "description": "must be number"
+                             },
+                             "max_gini_coef" : {
+                                 "type": "number",
+                                 "description": "must be number"
+                             },
+                             "max_top10_prop" : {
+                                 "type": "number",
+                                 "description": "must be number"
+                             }
+                         }
+                     }
+                 }
+             }
+        }
+    }
+}
+}

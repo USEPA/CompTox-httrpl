@@ -1,0 +1,17 @@
+rlist_0.4.6.1
+rcmdcheck_1.3.3
+remotes_2.3.0
+roxygen2_7.1.1
+rversions_2.0.2
+sessioninfo_1.1.1
+usethis_2.0.1
+pkgbuild_1.2.0
+RcppEigen_0.3.3.9.1
+interp_1.0-33
+devtools_2.4.1
+reldist_1.6-6
+doParallel_1.0.16
+RCurl_1.98-1.3
+latticeExtra_0.6-29
+RSQLite_2.2.7
+matrixStats_0.58.0

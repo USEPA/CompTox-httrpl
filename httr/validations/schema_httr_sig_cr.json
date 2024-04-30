@@ -1,0 +1,130 @@
+{
+"schema_httr_sig_cr" : {
+    "type": "object",
+    "required": [ "trt_name", "chem_id", "sig_name", "anl_name", "anl_opts", "conc", "resp", "cutoff",
+                "top", "top_over_cutoff", "n_gt_cutoff", "hitcall", "fit_method", "fit_params", "rmse", "er", "bmr",
+                "bmd", "bmdl", "bmdu", "ac50" ],
+    "properties": {
+        "trt_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "chem_id": {
+            "description": "must be a string and is required"
+        },
+        "sig_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "anl_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "anl_opts": {
+            "type": "object",
+            "properties": {
+                "dataset" : { 
+                    "type" : "string"
+                },
+                "method" :  { 
+                    "type" : "string"
+                },
+                "sigset" :  { 
+                    "type" : "string"
+                },
+                "bmr_factor" : { 
+                    "type" : "number"
+                }         
+            }
+        },
+        "conc": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "resp": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "cutoff": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "top": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "top_over_cutoff": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "n_gt_cutoff": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "hitcall": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "fit_method": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "fit_params" :{
+            "type" : "object" ,
+            "properties" : {
+                "a" : { 
+                    "type" : "number" 
+                },
+                "b" : { 
+                    "type" : "number" 
+                },
+                "tp" : { 
+                    "type" : "number" 
+                },
+                "p" : {  
+                    "type" : "number"
+                },
+                "ga" : { 
+                    "type" : "number"
+                },
+                "q" : { 
+                    "type" : "number" 
+                },
+                "la" : { 
+                    "type" : "number"
+                }           
+            }        
+        },
+        "rmse": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "er": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "bmr": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "bmd": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "bmdl": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "bmdu": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "ac50": {
+            "type": "number",
+            "description": "must be a string and is required"
+        }
+    }
+}
+}
+        
+

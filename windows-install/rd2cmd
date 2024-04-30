@@ -1,0 +1,1 @@
+install.packages('Rd2md',dependencies=TRUE,repos='http://cran.r-project.org/')

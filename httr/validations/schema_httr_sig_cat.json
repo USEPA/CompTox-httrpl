@@ -1,0 +1,92 @@
+{
+"schema_httr_sig_cat" : {
+    "type": "object",
+    "required": [ "sig_name", "source", "subsource", "type", "desc", "super_target", "super_target_level", "include0", "sig_sets", "fp_gene" ],
+    "properties": {
+        "sig_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "source": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "subsource": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "type": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "desc": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "super_target": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "super_target_level": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },  
+        "include0": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },  
+        "sig_sets" : {
+            "type" : "array",
+            "items" : { 
+                "type" : "string" 
+            }
+        },
+        "fp_gene" : {
+            "type" : "object",
+            "properties" : {
+                "ch" : {
+                    "type" : "object",
+                    "properties" : {
+                        "ds" : "array",
+                        "items" : { 
+                            "type" : "string" 
+                        }                  
+                    },
+                    "n": { 
+                        "type" : "integer" 
+                    }
+                }            
+            },
+            "type" : "object",
+            "properties" : {
+                "dn" : {
+                    "type" : "object",
+                    "properties" : {
+                        "ds" : "array",
+                        "items" : { 
+                            "type" : "string" 
+                        }                  
+                    },
+                    "n": { 
+                        "type" : "integer" 
+                    }
+                }            
+            },
+            "properties" : {
+                "up" : {
+                    "type" : "object",
+                    "properties" : {
+                        "ds" : "array",
+                        "items" : { 
+                            "type" : "string" 
+                        }                  
+                    },
+                    "n": { 
+                        "type" : "integer" 
+                    }
+                }            
+            }
+        }
+    }
+}
+}

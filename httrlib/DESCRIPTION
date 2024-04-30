@@ -1,0 +1,78 @@
+Package: httrlib
+Title: pipeline for automated in vitro screening platform 
+Version: 0.7.4
+Authors@R: 
+    person("Logan", "Everett", , "everett.logan@epa.gov", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: US EPA has designed a rapid and automated in vitro screening platform using the TempO-seq targeted RNA-seq assay to profile chemical bioactivity across a range of concentrations and cell types. The scale and complexity of these data (measurements of ~20,000 genes across thousands of samples) has necessitated the development of a bioinformatics pipeline to ensure standardized and reproducible results across these screening efforts.  This package includes R and Python code for rapid and robust processing of TempO-seq data, leveraging existing open-source tools wherever possible (e.g. HISAT2, samtools, DESeq2).  This pipeline also includes a battery of QC metrics developed specifically for TempO-seq data generated in large-scale automated experiments, and additional functions to store and access multiple levels of analysis results in an intuitive NoSQL database (MongoDB).  The package is intended for both internal EPA/ORD use and to allow external researchers to reproduce our results, process their own data, and ultimately facilitate the development of community standards for high-throughput transcriptomic analysis in a regulatory context.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+exports:
+    DESeq2_cut
+    addQCplotCols
+    as.mongo.date
+    check_collection_exists
+    countGini
+    countQC
+    countQCflag
+    countStats
+    degFrame
+    deleteByID
+    filterProbesByMean
+    filterSamplesByTotal
+    findByID
+    findIDs
+    flattenDEG
+    getAnlName
+    getChemTrts
+    getCredentials
+    getDB
+    getDEGs
+    getDocIDs
+    getFCmatrix
+    getProbeManifest
+    getQCdefault
+    getTrts
+    getWellCounts
+    getWellInfo
+    insertByID
+    insertManyDEG
+    insertOneDEG
+    iterate
+    mongoQuery
+    mongoURL
+    openMongo
+    outerFences
+    plotQCjitter
+    plotQCviolin
+    qcBatch
+    runDESeq2
+    runDESeq2ForChemCond
+    runDESeq2Single
+    sameCtrlWells
+    sampleID_wrapper
+    splitIDs
+    trtGrpWells
+    tss_deg_count
+    tss_l2_norm
+    update_attenuation_factors
+    updateqcFlags
+    validateProbeManifest
+    validate_httr_well_trt_schema
+Suggests: 
+    BiocParallel,
+    DESeq2,
+    ggplot2,
+    reldist,
+    rlist,
+    stats,
+    testthat
+Imports:
+    data.table,
+    jsonlite,
+    mongolite,
+    foreach,
+    stringr

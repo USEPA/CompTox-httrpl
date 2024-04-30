@@ -1,0 +1,12 @@
+{
+ "threads": 8,
+ "dbg": true,
+ "rerun": true,
+ "strict": true, 
+ "fq_path": "../../data/httrpl_automationTestData/lionel_fastq/",
+ "sample_key": "test_httrpl_sampleKey_main.csv",
+ "db_fa": "../../data/httrpl_automationTestData/alignmentFiles/humanWT_v1.2.fa",
+ "db_ind": "../../data/httrpl_automationTestData/alignmentFiles/v1.2_hisat2Index/",
+ "batch_size":5,
+ "reindex": false
+}

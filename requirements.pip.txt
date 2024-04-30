@@ -1,0 +1,8 @@
+numpy
+pandas
+pymongo
+mongoengine
+deepdiff
+pytest
+celery
+redis

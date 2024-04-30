@@ -1,0 +1,51 @@
+{
+"schema_httr_counts_qc" : {
+    "type": "object",
+    "required": [ "sample_id", "count_id", "n_reads", "n_reads_mapd", "mapd_frac", "bad_probe_count", "n_cov5", "n_sig80","top10_prop", "gini_coef", "qc_flag" ],
+    "properties": {
+        "sample_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "count_id": {
+            "description": "must be a string and is required"
+        },
+        "n_reads": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "n_reads_mapd": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "mapd_frac": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "bad_probe_count": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "n_cov5": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "n_sig80": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "top10_prop": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "gini_coef": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "qc_flag": {
+            "type": "string",
+            "description": "must be a string and is required"
+        }
+    }
+}
+}

@@ -1,0 +1,56 @@
+{
+"schema_httr_probe" : {
+    "type": "object",
+    "required": [ "index", "probe_name", "probe_idnum", "probe_seq", "transcripts", "entrez_id", "gene_symbol", "probe_flag" ],
+    "optional": [ "ensembl_gene", "ref_transcript", "attenuation"],
+    "properties": {
+        "index": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "probe_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "probe_idnum": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "probe_seq": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "transcripts": {
+            "type": "array",
+            "items" : { 
+                "type" : "string" 
+            }
+        },
+        "entrez_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "gene_symbol": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "ensembl_gene": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "ref_transcript": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "probe_flag": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "attenuation": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        }
+    }
+}
+}
+

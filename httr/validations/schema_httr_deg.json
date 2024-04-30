@@ -1,0 +1,134 @@
+{
+"schema_httr_deg" : {
+    "type": "object",
+    "required": [ "trt_grp_id", "anl_name", "anl_opt", "degs", "probe_id", "l2fc", "l2fc_se", "mn",
+                "st", "p", "p_adj", "run_time", "update_notes" ],
+    "optional": [ "chem_id", "ctrl", "media", "timeh", "conc", "dose_level", "stype", "pg_id", "block_id" ], 
+    "properties": {
+        "trt_grp_id": {
+            "description": "must be a string and is required"
+        },
+        "anl_name": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "anl_opt": {
+            "type": "object",
+            "properties": {
+                "meanncnt0" : { 
+                    "type" : "integer" 
+                },
+                "plateteffect" : { 
+                    "type" : "integer"
+                },
+                "shrinkage" : { 
+                    "type" : "string"
+                } 
+            }               
+        },
+        "degs": {
+            "type" : "array",
+            "items" : {
+                "type" : "object",
+                "properties": {
+                    "probe_id" : { 
+                        "type" : "string" 
+                    },
+                    "baseMean" : { 
+                        "type" : "number" 
+                    },
+                    "log2FoldChange" : { 
+                        "type" : "number" 
+                    },
+                    "lfcSE" : { 
+                        "type" : "number" 
+                    },
+                    "stat" : { 
+                        "type" : "number" 
+                    },
+                    "pvalue" : { 
+                        "type" : "number" 
+                    },  
+                    "padj" : { 
+                        "type" : "number" 
+                    } 
+                }          
+            } 
+        },
+        "probe_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "l2fc": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "l2fc_se" :{
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "mn" :{
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "st" :{
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "p": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "p_adj" :{
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "run_time" :{
+            "description": "must be a string and is required"
+        },
+        "update_notes": {
+            "type" : "object",
+            "properties" : {
+                "run_times" : {},
+                "note" : {
+                    "type" : "string" 
+                }            
+            }        
+        },
+        "chem_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "ctrl": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "media": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "timeh": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "conc": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "dose_level": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "stype": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "pg_id": {
+            "description": "must be a string and is required"
+        },
+        "block_id": {
+            "description": "must be a string and is required"
+        }
+    }
+}
+}

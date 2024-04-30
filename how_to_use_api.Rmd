@@ -1,0 +1,344 @@
+---
+title: "title"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+To run the httrlib package, you will need to set up 2 credential files as follows:
+
+
+1 - setting up credential files
+
+~/.mongopw
+
+fill in your sandbox db where you have full access and any other dbs you have access to
+fill in the host_name, user_id,password and provide the authMechanism that corresponds to your mongo server for each line
+
+[{"host":[host_name], "db":[sandbox_db], "user":[user_id], "passwd":[password],"authMechanism":"SCRAM-SHA-256", "authSource":"admin"},
+{"host":[host_name], "db":[db1], "user":[user_id], "passwd":[password],"authMechanism":"SCRAM-SHA-256", "authSource":"admin"},
+{"host":[host_name], "db":[db2], "user":[user_id], "passwd":[password],"authMechanism":"SCRAM-SHA-256", "authSource":"admin"},
+{"host":[host_name], "db":[db3], "user":[user_id], "passwd":[password],"authMechanism":"SCRAM-SHA-256", "authSource":"admin"},
+{"host":[host_name], "db":[db4], "user":[user_id], "passwd":[password],"authMechanism":"SCRAM-SHA-256", "authSource":"admin"}]
+
+
+
+~/.mngdb/passwd
+
+fill in your id/password to your sandbox db
+
+[user]:[password]
+
+
+2 - Guide on using some of the mongo db/query functions provided by the package:
+
+
+2.1: getCredentials:
+
+getCredentials <- function(host=getOption("httrDefaultHost"), db=NULL)
+
+Rather than loading entire keychains into memory, it just quickly scans ~/.mongopw and ~/.mngdb/passwd for relevant user,passwd combo
+Returns NULL or a list with members user,passwd (and host,db if specified)
+
+example of usage:
+
+mycred <- getCredentials('mongo_server','mydb')
+
+2.2: mongoURL:
+
+mongoURL <- function(host, user, passwd, db, authSource=NULL, authMechanism=NULL) 
+
+This function may be used to return a string formatted from the passed parameters
+
+example of usage:
+
+mongo(collection=collection, url=mongoURL(host=host, user=user, passwd=passwd, db=db, authSource = authSource), verbose=getOption("verbose"))
+
+the mongo function passes host/user/passwd/db/authSource to mongoURL which returns the corresponding formated string
+
+
+
+2.3:openMongo:
+
+openMongo <- function(host=getOption("httrDefaultHost"), user=NULL, passwd=NULL,
+                      db=NULL, collection=NULL, authSource = NULL, authMechanism = NULL)
+
+this function opens a mongo connection to provided db
+
+example of usage:
+
+DB <- openMongo(host=db_host, db=db_name, collection=collection)
+
+openMongo returns the mongolite DB object
+
+
+2.4 getDocIDs:
+
+getDocIDs <- function(docs, id_field="sample_id")
+
+extract a certain ID field (e.g. sample_id) out of a list of documents
+
+example of usage: 
+
+names(trt_list) <- getDocIDs(trt_list, id_field = "trt_grp_id")
+
+
+2.5 findByID :
+
+findByID <- function(DB, ids=c(), id_field="sample_id", id_only=FALSE, fields='{}', dump=FALSE, debug=getOption("debug",default=FALSE))
+
+Given a vector of IDs (typically either _id or sample_id), return an iterable object (mongo iterator or list) corresponding to all 
+matching documents in a collection. If ids is an empty list, return all documents in the collection. Also has options to limit the result 
+to just the id_field or any other subset of fields, and to dump out the data as a list (stored in local memory) instead of returning the 
+pymongo Cursor object.
+
+example of usage: 
+
+found_id <- findByID(DB, ids=ids, id_field=id_field, id_only=TRUE, dump=TRUE)
+
+2.6 splitIDs:
+
+Split a list of IDs based on which are present/absent in a collection.
+Given a list of IDs, search against a particular collection, and return a dict with two lists keyed by "present" and "absent".
+
+example of usage: 
+
+count_samples <- splitIDs(DB=httr_counts_qc, ids=count_samples)
+
+splitIDs <- function(DB, ids, id_field="sample_id")
+
+2.7 deleteByID:
+
+deleteByID <- function(DB, ids=c(), id_field="sample_id", delete_all=FALSE, debug=getOptions("debug",default=FALSE))
+
+Delete documents from a collection.
+Given a list of IDs, delete all matching documents from a collection, or delete ALL documents. The primary purpose is to remove documents 
+from a collection before replacing them when rerun=True in a particular pipeline step.
+
+example of usage:
+
+deleteByID(DB=httr_counts_qc, ids=count_samples$present, delete_all=FALSE, debug=debug)
+
+2.8 insertByID:
+
+insertByID <- function(DB, docs, id_field="sample_id", rerun=FALSE, debug=getOption("debug",default=FALSE))
+
+ Insert a list of documents into a MongoDB collection without creating redundant entries.
+# Takes a list of dicts and first checks whether any documents with matching IDs are already present. If so, these documents are either 
+# skipped for insert (rerun=False) or replaced (rerun=True)
+
+example of usage:
+
+my_list_of_dicts = [{"my_id":"0","id_val":"0"},{"my_id":"1","id_val":"1"},{"my_id":"2","id_val":"2"}]
+nb_of_insertions = insertByID(DB_object, my_list_of_dicts, id_field="my_id",rerun=FALSE)
+
+2.9 findIDs:
+
+findIDs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection=NULL, id_field="_id", debug=getOption("debug", default=FALSE), ...)
+
+Generic function to get IDs matching any query from any collection
+Given an open DB connection or connection parameters, run a query and get all distinct values of id_field
+
+example of usage:
+
+found_id <- findIDs(DB, db_host='my_host', db_name='my_dbname', collection='my_collection', id_field=id_field)
+
+
+2.10 mongoQuery: Build a mongo query from an arbitrary set of params or a list
+
+mongoQuery <- function(...)
+
+Takes a list of named values/vectors and converts to a JSON-format mongo query. Each entry with length > 1 is interpreted
+as a set of potential matching values and converted to the $in keyword for mongo
+
+Return Value:
+(json) = Query ready to pass to mongolite functions
+
+example of usage:
+
+well_filter <- mongoQuery('_id'=0, probe_cnts=0, raw_id=0, counts_id=0, trt_id=0)
+
+
+2.11 getDB: obtain a DB object after connecting to mongo db
+
+getDB <- function(DB=NULL, db_host=NULL, db_name=NULL, collection=NULL){
+
+a wrapper around openMongo that makes sure db_host and db_name are provided when DB is not
+
+example of usage:
+
+DB <- getDB(NULL,'my_db_host','my_db_name','my_collection')
+
+2.12 iterate:
+
+iterate <- function(DB=NULL,query=NULL,fields=NULL)
+
+with DB object as well as fields and potentially query named list, inquire db for matching documents
+
+example of usage:
+
+prev_update_notes <- iterate(DB,query=deg_query,fields=mongoQuery('_id'=0, update_notes=1))
+
+2.13 Find:
+
+Find <- function(DB=NULL, ...)
+
+with DB object as well as fields and potentially query named list, inquire db for matching documents
+
+example of usage: 
+
+chem_info <- Find(httr_chem,query=mongoQuery(chem_id = cmp_chem_id))
+
+
+2.14: getAnlName
+
+getAnlName <- function(mean_cnt=getOption("mean_cnt"), plate_effect=F, shrinkage="normal", ...)
+
+Convert analysis options to standardized anl_name for httr_deg docs
+
+example of usage:
+
+anl_name = getAnlName(mean_cnt = getOption("mean_cnt"), plate_effect = F, shrinkage = "normal")
+this will simply return:  "meanncnt0_5-plateteffect_0-shrinkage_normal"
+
+2.15: getChemTrts
+
+getChemTrts <- function(DB=NULL, chem_id, 
+                        db_host=NULL, db_name=NULL, collection="httr_trt_grp_cmp",
+                        pg_id=NULL, media=NULL, timeh=NULL,
+                        max_dose_level=8, debug=getOption("debug",default=FALSE)
+) 
+
+Returns the relevant documents from httr_trt_grp_cmp as a named list, where names come from trt_grp_id field, and are sorted by dose_level
+
+example of usage:
+
+
+chemTrts <- getChemTrts(chem_id='DTXSID999999', db_host=<server_host>, db_name=<db>, collection=collections["httr_trt_grp_cmp"], 
+                        pg_id=pg_id, media=midia, timeh=timeh, max_dose_level=8, debug=debug)
+  
+filtering options:
+
+pg_id (character) = Limit httr_trt_grp_cmp to this plate group, useful if multiple dose response series for same chem_id
+media (character) = Limit httr_trt_grp_cmp to this media type, useful if multiple dose response series for same chem_id
+timeh (integer) = Limit httr_trt_grp_cmp to this timeh, useful if multiple dose response series for same chem_id
+
+2:16: getDEGs
+
+Pull out DESeq2 results from httr_deg table
+
+getDEGs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_deg", 
+                    single=F, flatten=F, warn_count=100, warn_stype=T, warn_anl=T,
+                    debug=getOption("debug",default=FALSE),
+                    ...
+)
+
+example of usage:
+
+  # Pull all DEG results matching anl_name, stype, and any additional query terms specified
+  deg_dump <- getDEGs(db_host=db_host, db_name=db_name, collection=collections["httr_deg"], 
+                      single=F, flatten=F, debug=debug,
+                      anl_name=anl_name, stype="test sample", ...)
+                  
+  Notes: anl_name is the string returned by getAnlName
+                      
+
+2.17: getFCmatrix
+
+Pull out DESeq2 results for multiple contrasts from httr_deg collection and reshape into wide matrix
+
+getFCmatrix <- function(db_host, db_name, collections=character(0), 
+                        anl_name=getAnlName(mean_cnt=mean_cnt, plate_effect=plate_effect, shrinkage=shrinkage), 
+                        mean_cnt=getOption("mean_cnt"), plate_effect=T, shrinkage="normal",
+                        stype="test sample", debug=getOption("debug",default=FALSE),
+                        ...
+)
+
+it returns: (list of data.frame) = First member $fc is matrix of contrast (rows) x probe (col), Second member $cmp is matrix of contrast (rows) x meta-data columns, 
+both in same row order. Missing probes will be NA.
+
+example of usage:
+
+res = getFCmatrix(<host>,<db>,collections=<collection>,aln_name="meanncnt0_5-plateteffect_0-shrinkage_normal",
+                  mean_cnt=getOption("mean_cnt"), plate_effect=T, shrinkage="normal",stype="test sample", debug=getOption("debug",default=FALSE)
+
+
+2.18: getProbeManifest
+
+Function to pull out all probe info as a data.frame
+
+getProbeManifest <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_probe",fields='{"transcripts":0}',...) 
+
+
+example of usage:
+
+
+probeManifest <- getProbeManifest(db_host=db_host, db_name=db_name, collection=db_probe)
+
+
+
+2.19: getQCdefault
+
+
+Function to determine appropriate threshold for a QC metric when not specified:
+# NOTE: When the relevant flag is not in httrQCflags, this will always return NULL
+
+
+getQCdefault <- function(qc_metric)
+
+example of usage:
+n_sig80 <- getQCdefault("n_sig80")
+
+2.20: getTrts
+
+Low-level function to extract all docs from httr_trt_grp_cmp that match a specific query
+
+getTrts <- function(DB, query, debug=getOption("debug",default=FALSE))
+
+example of usage:
+  Extracting httr_trt_grp_cmp for trt_grp_id - should get exactly one hit:
+  
+  testTrt <- getTrts(DB = httr_trt_grp_cmp, query = mongoQuery(trt_grp_id = trt_grp_id), debug = debug)
+
+2:21: getWellCounts
+
+Function to pull out counts and treatment info as data.frames for a set of sample IDs
+
+getWellCounts <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_well", 
+                          debug=getOption("debug",default=FALSE), sample_id=NULL, ...
+)
+
+returns:
+
+(list) = Has two members, both data.frames: $treatments has rows = samples, $counts has rows = probes, columns = samples
+
+example of usage:
+
+my_counts <- getWellCounts(sample_id=my_samples, db_host=db_host, db_name=db_name, collection=collections["httr_well"], debug=debug)
+
+
+2.22: getWellInfo
+
+Function to pull out treatment info ONLY from httr_well as a data.frame for any relevant query
+
+getWellInfo <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_well", 
+                        debug=getOption("debug",default=FALSE), ...
+) 
+
+example of usage:
+
+data <- getWellInfo(<db_obj>,<host>,<db>,collection="httr_well",debug=getOption("debug",default=FALSE))
+
+```{r setup}
+library(httrlib)
+```
+
+

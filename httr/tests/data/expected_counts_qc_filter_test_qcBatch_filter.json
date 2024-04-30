@@ -1,0 +1,12 @@
+{"TC00283151_D21_2" : {
+    "bad_probe_count": 513,
+    "gini_coef": 0.895281888,
+    "mapd_frac": 0.89846,
+    "n_cov5": 3323,
+    "n_reads": 100000,
+    "n_reads_mapd": 89846,
+    "n_sig80": 1856,
+    "qc_flag": "LOW_READS",
+    "sample_id": "TC00283151_D21_2",
+    "top10_prop": 0.041916168
+}}

@@ -1,0 +1,10 @@
+*.pyc
+.ipynb_checkpoints
+__pycache__
+.Rproj.user
+*.Rproj
+README.html
+.RData
+.Rhistory
+NAMESPACE
+

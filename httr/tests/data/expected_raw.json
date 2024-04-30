@@ -1,0 +1,137 @@
+{
+    "TC00283171_J02":
+    {
+        "path" : "data/httrpl_automationTestData/lionel_fastq",
+        "fastq" : "TC00283171_J02.fastq",
+        "sample_id" : "TC00283171_J02",
+        "md5" : "db445a6da04701f3058c69df249a36d0",
+        "rd_len" :50,
+        "qc_flag" : "OK",
+        "read_grps" : [
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 1,
+                        "n_reads" : 507404
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 2,
+                        "n_reads" : 501288
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 3,
+                        "n_reads" : 491608
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 4,
+                        "n_reads" : 489840
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 5,
+                        "n_reads" : 490217
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 6,
+                        "n_reads" : 491691
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 7,
+                        "n_reads" : 499949
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "277",
+                        "flowcell_id" : "CB6A8ANXX",
+                        "lane_num" : 8,
+                        "n_reads" : 511945
+                }
+        ]
+    },
+    "TC00283151_C16":
+    {
+        "path" : "data/httrpl_automationTestData/lionel_fastq",
+        "fastq" : "TC00283151_C16.fastq",
+        "sample_id" : "TC00283151_C16",
+        "md5" : "b5b5dfcef11cd9bac051f3ea4d730c32",
+        "rd_len" : 50,
+        "qc_flag" : "OK",
+        "read_grps" : [
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 1,
+                        "n_reads" : 689911
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 2,
+                        "n_reads" : 685740
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 3,
+                        "n_reads" : 679269
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 4,
+                        "n_reads" : 677912
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 5,
+                        "n_reads" : 677619
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 6,
+                        "n_reads" : 675172
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 7,
+                        "n_reads" : 684207
+                },
+                {
+                        "ins_id" : "D00572",
+                        "run_id" : "276",
+                        "flowcell_id" : "CB4DJANXX",
+                        "lane_num" : 8,
+                        "n_reads" : 689579
+                }
+        ]
+    }
+}
+

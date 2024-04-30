@@ -1,0 +1,14 @@
+{
+ "threads": 5,
+ "dbg": true,
+ "rerun": false,
+ "strict": true,
+ "sample_key": "insert file path to user-provided sample key file, must include sample_id and fq_file columns",
+ "fq_path": "(optional) path to location of all fastq files listed in sample key file, or remove this parameter and put full path to each file in the sample key file",
+ "db_fa": "/path/to/index.fa",
+ "db_ind": "/path/to/hisat2Index_dir/",
+ "db_host": "insert db host",
+ "db_name": "insert db name",
+ "batch_size":8,
+ "reindex": false
+}

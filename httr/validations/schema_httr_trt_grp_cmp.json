@@ -1,0 +1,80 @@
+{
+"schema_httr_trt_grp_cmp" : {
+    "type": "object",
+    "required": [ "trt_grp_id", "ctrl_wells", "trt_wells", "plates" ],
+    "optional": [ "chem_id", "ctrl", "media", "timeh", "conc", "dose_level", "stype", "pg_id", "block_id" ],           
+    "properties": {
+        "trt_grp_id": {
+            "description": "must be a string and is required"
+        },
+        "ctrl_wells": {
+            "type": "array",
+            "items": {
+                "type" : "object",
+                "properties" : {
+                    "sample_id" : 
+                        {},
+                    "plate_id" : 
+                        {},
+                    "well_id" :
+                        {}
+                 }
+            }
+        },
+        "trt_wells": {
+            "type": "array",
+            "items": {
+                "type" : "object",
+                "properties" : {
+                    "sample_id" : 
+                        {},
+                    "plate_id" : 
+                        {},
+                    "well_id" :
+                        {}
+                 }
+            }
+        },
+        "plates": {
+            "type": "array",
+            "items": {
+                "type" : "string"
+            }
+        },
+        "chem_id": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "ctrl": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "media": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "timeh": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "conc": {
+            "type": "number",
+            "description": "must be a string and is required"
+        },
+        "dose_level": {
+            "type": "integer",
+            "description": "must be a string and is required"
+        },
+        "stype": {
+            "type": "string",
+            "description": "must be a string and is required"
+        },
+        "pg_id": {
+            "description": "must be a string and is required"
+        },
+        "block_id": {
+            "description": "must be a string and is required"
+        }
+    }
+}
+}

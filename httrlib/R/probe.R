@@ -1,4 +1,5 @@
 #' getProbeManifest
+#' 
 #' Function to pull out all probe info as a data.frame
 #' This excludes the transcript field in order to get a flat table, but includes everything else
 #' The table is also sorted on the index field to ensure the row order of the original manifest
@@ -8,10 +9,11 @@
 #' @param db_name (\emph{character}) = If DB is NULL, this specifies the DB name to connect to
 #' @param collection (\emph{character}) = If DB is NULL, this specifies the collection to connect to, default: httr_probe
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
+#' @param ... = Any additional parameters are passed to Find --> mongoQuery to constrain the query
 #' @export getProbeManifest
 #' @return (\emph{data.frame}) = Data frame with complete manifest 
 
-getProbeManifest <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_probe",fields='{"transcripts":0}', output_dir = "not_set", ...) {
+getProbeManifest <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_probe",fields='{"transcripts":0}', output_dir = "", ...) {
 
   DB <- getDB(DB,db_host,db_name,collection, output_dir = output_dir)
   
@@ -21,20 +23,24 @@ getProbeManifest <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="ht
 }
 
 #' validateProbeManifest
-#' Function to validate a probe manifest (taken as a data.frame), so that there is a check to ensure the probe manifest is formatted correctly, 
-#' is not missing and required data, and can be used.
 #' 
-#' @param file_or_data: file path or data.frame/data.table of probe manifest; 
-#' defaults to ../data/httrpl_automationTestData/httr_probe_data/human_wt_1.2.csv
-#'
-#' constraints are define @ https://teams.microsoft.com/l/entity/com.microsoft.teamspace.tab.wiki/tab::79582d6c-f6ec-490c-87e1-685a2c988b22?context=%7B%22subEntityId%22%3A%22%7B%5C%22pageId%5C%22%3A2%2C%5C%22sectionId%5C%22%3A8%2C%5C%22origin%5C%22%3A2%7D%22%2C%22channelId%22%3A%2219%3A2580b487b7e74a1fa1d99e8e133fc556%40thread.skype%22%7D&tenantId=88b378b3-6748-4867-acf9-76aacbeca6a7
+#' Function to validate a probe manifest (taken as a data.frame).
+#' Checks for the following constraints:
+#'  \enumerate{
+#'    \item "index", "probe_name", "probe_idnum", "probe_seq", "transcripts", "entrez_id", "gene_symbol", "probe_flag" are present
+#'    \item no other columns but the following are present:  "index", "probe_name", "probe_idnum", "probe_seq", "transcripts", "entrez_id", "gene_symbol", "ensembl_gene", "ref_transcript", "probe_flag", "attenuation"
+#'    \item index is integer, probe_name is character, probe_idnum is integer, probe_seq is character, entrez_id is character, gene_symbol is character, ensembl_gene is character, ref_transcript is character, probe_flag is character, attenuation is not integer
+#' }
+#' 
+#' @param file_or_data: file path or data.frame/data.table of probe manifest
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
+#' 
 #' @import data.table
 #' @export validateProbeManifest
 #' @return a list of validation errors or an empty list if all tests pass
 #'
 
-validateProbeManifest <- function(file_or_data="../data/httrpl_automationTestData/httr_probe_data/human_wt_1.2.csv", DB=NULL, db_host=NULL, db_name=NULL, collection="httr_probe", output_dir = "not_set"){
+validateProbeManifest <- function(file_or_data, DB=NULL, db_host=NULL, db_name=NULL, collection="httr_probe", output_dir = ""){
 
   if (inherits(file_or_data, "character")){
     probe_data <- read.csv(file_or_data, na.strings = "") 
@@ -138,7 +144,7 @@ validateProbeManifest <- function(file_or_data="../data/httrpl_automationTestDat
     }
       
     print("checking that attenuation is of integer type ...")
-    if ('attenuation' %in% colnames(probeData) && 'attenuation' %in% colnames(probeData) && class(probeData[, attenuation]) != "integer"){
+    if ('attenuation' %in% colnames(probeData) && class(probeData[, attenuation]) != "integer"){
       newelem <- paste("attenuation should be of integer type \n")
       results <- c(results, newelem)
     }
@@ -150,21 +156,22 @@ validateProbeManifest <- function(file_or_data="../data/httrpl_automationTestDat
 }
 
 #' insert_probe_manifest
+#' 
 #' Function to insert a probe manifest into the httr_probe collection after validating it
 #' 
-#' @param file_or_data (\emph{character}) = defaults to ../data/httrpl_automationTestData/httr_probe_data/human_wt_1.2.csv
+#' @param file_or_data: file path or data.frame/data.table of probe manifest
 #' @param DB: mongoDB object if not provided db_host/db_name used
 #' @param db_host: (\emph{character}) mongo url with or without port
 #' @param db_name: (\emph{character}) mongo database or sandbox
 #' @param status: (\emph{character}) whether of not we keep prior data if found in httr_probe (status="KEEP"), erase all items in collection (status="RERUN"), or just replace the probe_name found (status="REPLACE")
-#' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
+#' @param output_dir: (\emph{character}) used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #'
 #' @import data.table
 #' @export insert_probe_manifest
 #' @return TRUE if insertion went through
 #'
 
-insert_probe_manifest <- function(file_or_data="../data/httrpl_automationTestData/httr_probe_data/human_wt_1.2.csv", DB= NULL, db_host = NULL, db_name = NULL, status = "KEEP", output_dir = "not_set"){
+insert_probe_manifest <- function(file_or_data, DB= NULL, db_host = NULL, db_name = NULL, status = "KEEP", output_dir = ""){
 
   validation_results <- validateProbeManifest(file_or_data, DB, db_host, db_name, output_dir = output_dir)
   
@@ -197,15 +204,17 @@ insert_probe_manifest <- function(file_or_data="../data/httrpl_automationTestDat
   return(FALSE)
 }
 
-#' create_fasta_from_probe by filtering data.table by columns probe_name, probe_seq, prepending each probe_name with '>'
-#' and followed by its sequence and writing it out to file
-#' creates a fasta file holding the info presented in the passed probe data
+#' create_fasta_from_probe
+#' 
+#' Filters data.table by columns probe_name, probe_seq, prepending each probe_name with '>' and followed by its sequence and writing it out to file
+#' Creates a fasta file holding the info presented in the passed probe data
 #'
 #' @param file_or_data: file path or data.frame/data.table of probe information; if not provided this will be generated from the httr_probe collection of corresponding DB
-#' @param output_fasta_file file to be written to
-#' @param DB DB object corresponding the mongo collection when provided
-#' @param db_host when no DB mongo server url
-#' @param db_name when no DB db or sandbox
+#' @param output_fasta_file: file to be written to
+#' @param DB: DB object corresponding the mongo collection when provided
+#' @param db_host: when no DB mongo server url
+#' @param db_name: when no DB db or sandbox
+#' 
 #' @import data.table
 #' @export create_fasta_from_probe
 #' @return nothing explicit
@@ -241,19 +250,21 @@ create_fasta_from_probe <- function(file_or_data, DB=NULL, db_host=NULL, db_name
 }
 
 #' update_attenuation_factors
-#' Create function in httr/Rlib/db/probe.R to update/replace attenuations factors in an existing httr_probe collection
+#' 
+#' Function to update/replace attenuation factors in an existing httr_probe collection
 #'
 #' @param db_host: mongo url with or without port
 #' @param db_name: mongo database or sandbox
+#' @param input_file: file to load the probes from
 #' @param collection: mongo collection to update - default httr_probe
 #'
 #'   changes attenuation values for probes found in dataframe in the collection and change to '1' any probe in collection not in the data.frame
-#' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
+#' @param output_dir: (\emph{character}) used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @import data.table
 #' @return nothing explicit
 #' @export update_attenuation_factors
 
-update_attenuation_factors <- function(db_host, db_name, input_file, collection='httr_probe', output_dir = "not_set"){
+update_attenuation_factors <- function(db_host, db_name, input_file, collection='httr_probe', output_dir = ""){
 
   httr_probe_coll <- openMongo(db_host = db_host, db_name = db_name, collection = collection, check_collection_present=TRUE, output_dir = output_dir)
   

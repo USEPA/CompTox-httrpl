@@ -118,7 +118,7 @@ def do_col_check(
     t = datetime.datetime.now()
 
     if proc is not None:
-        step = col.count() // thread_nb
+        step = col.count_documents() // thread_nb
         doc = col.find({}).skip(step * proc).limit(step)
     else:
         doc = col.find({})

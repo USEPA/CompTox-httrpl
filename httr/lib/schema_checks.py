@@ -97,7 +97,7 @@ class collection():
 
         """
         self.doc = self.col.find({})
-        print(f"{self.doc.count()} docs found in {self.db}/{self.name}")
+        print(f"{self.col.count_documents()} docs found in {self.db}/{self.name}")
         for d in list(self.doc):
             try:
                 validate(d, self.schema[self.schema_obj])
@@ -244,7 +244,7 @@ class schema_check():
         """
         col = collection(c, self.DB[c], self.DB.name, type_check)
         errors = col.check()
-        if col.doc.count() == 0:
+        if col.doc.count_documents() == 0:
             print(f"No documents found for {self.DB.name} / {c}")
         return errors
 

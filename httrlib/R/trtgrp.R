@@ -48,7 +48,7 @@ getChemTrts <- function(DB=NULL, chem_id,
                         db_host=NULL, db_name=NULL, collection="httr_trt_grp_cmp",
                         pg_id=NULL, media=NULL, timeh=NULL,
                         max_dose_level=8, debug=getOption("debug",default=FALSE),
-                        output_dir = "not_set"
+                        output_dir = ""
 ) {
   # Make sure chem_id defined
   if(is.null(chem_id)) {

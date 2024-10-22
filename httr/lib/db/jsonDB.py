@@ -321,7 +321,7 @@ class json_DB_collection:
                 
         self.save()
         
-    def count(self, query={},filter={}):
+    def count_documents(self, query={},filter={}):
         """
         counts rows corresponding to passed query
         Parameter:

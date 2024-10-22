@@ -16,7 +16,7 @@
 
 getWellCounts <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_well", 
                           debug=getOption("debug",default=FALSE), sample_id=NULL, 
-                          output_dir = "not_set", ...
+                          output_dir = "", ...
 ) {
   if (hasArg("sample_ids"))
     stop("sample_ids must be replaced with sample_id when calling getWellCounts")
@@ -115,7 +115,7 @@ getWellCounts <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_
 
 # TO DO: Extra parameters to request a subset of treatment columns
 getWellInfo <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_well", 
-                        debug=getOption("debug",default=FALSE), output_dir = "not_set", ...
+                        debug=getOption("debug",default=FALSE), output_dir = "", ...
 ) {
   # Open DB connection if an open connection object was not provided
   

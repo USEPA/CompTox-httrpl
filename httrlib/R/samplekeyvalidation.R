@@ -822,7 +822,7 @@ readWellTrtFile <- function(sampleID_file){
 #' @export sampleID_wrapper
     
 
-sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem", status="KEEP", skipped_tests=c(), db_host=NULL, db_name=NULL, validate=TRUE, max_dose_level = 8, required_cols = c("sample_id", "plate_id", "well_id", "trt_name", "qc_flag"), extra_cols = c(), output_dir = "not_set", ...){
+sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem", status="KEEP", skipped_tests=c(), db_host=NULL, db_name=NULL, validate=TRUE, max_dose_level = 8, required_cols = c("sample_id", "plate_id", "well_id", "trt_name", "qc_flag"), extra_cols = c(), output_dir = "", ...){
 
 
   if (missing(wellTrt)){
@@ -941,7 +941,7 @@ sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, ta
 #' @export sampleID_scan_and_update
 
 
-sampleID_scan_and_update <- function(orig_sampleID_file=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem", skipped_tests=skipped_tests, db_host, db_name, output_dir = "not_set", ...){
+sampleID_scan_and_update <- function(orig_sampleID_file=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem", skipped_tests=skipped_tests, db_host, db_name, output_dir = "", ...){
 
   wellTrt <- readWellTrtFile(sampleID_file)
   wellTrt <- as.data.table(wellTrt)
@@ -1018,7 +1018,7 @@ sampleID_scan_and_update <- function(orig_sampleID_file=NULL, sampleID_file=NULL
 #' @export insert_into_httr_study
 
 insert_into_httr_study <- function(study_id="httr_mcf7_pilot", study_name="HTTr MCF-7 Pilot Study", 
-study_desc="Pilot of HTTr platform on MCF-7 cells testing multiple media types and exposure durations", study_probe="httr_probe", study_well="httr_well", study_trt_grp_cmp="httr_trt_grp_cmp", study_degs="httr_deg", src="BioSpyder", tech="TempoSeq", times_hr= list(6,12,24), max_dose_level=8,   media=list("DMEM", "PRF.DMEM"), cell_types=list("MCF-7"), chem_ids=list("TP0001651A01","TP0001651A02","TP0001651A03","TP0001651A04","TP0001651A05","TP0001651A06",  "TP0001651B01", "TP0001651B02", "TP0001651B03", "TP0001651B04", "TP0001651B05", "TP0001651B06", "TP0001651C01", "TP0001651C02","TP0001651C03","TP0001651C04",  "TP0001651C05", "TP0001651C06"), nreps=3, bs_assay_id="", assay_name="human_wt_1.2_mcf7", platform_name="human_wt", platform_ver="1.2", atten_type="mcf7", probe_source_file="180905 Human Whole Transcriptome 1.2 Manifest.xlsx", probe_source_date="2018-09-05T00:00:00Z", probe_source_rcv="2019-07-15T13:24:12Z", probe_ncct_file="httr_mcf7_pilot_probe.csv", probe_ncct_date="2019-09-23T13:44:50.419Z" , fasta_file="/share/projects/HTTr/HTTr_pipeline_dev/HumanWT_v1/AlignCount/genome/humanWT_v1.2.fa", anno_type="refseq", anno_date="2018-09-05T00:00:00Z", db_host=NULL, db_name=NULL, output_dir = "not_set"){
+study_desc="Pilot of HTTr platform on MCF-7 cells testing multiple media types and exposure durations", study_probe="httr_probe", study_well="httr_well", study_trt_grp_cmp="httr_trt_grp_cmp", study_degs="httr_deg", src="BioSpyder", tech="TempoSeq", times_hr= list(6,12,24), max_dose_level=8,   media=list("DMEM", "PRF.DMEM"), cell_types=list("MCF-7"), chem_ids=list("TP0001651A01","TP0001651A02","TP0001651A03","TP0001651A04","TP0001651A05","TP0001651A06",  "TP0001651B01", "TP0001651B02", "TP0001651B03", "TP0001651B04", "TP0001651B05", "TP0001651B06", "TP0001651C01", "TP0001651C02","TP0001651C03","TP0001651C04",  "TP0001651C05", "TP0001651C06"), nreps=3, bs_assay_id="", assay_name="human_wt_1.2_mcf7", platform_name="human_wt", platform_ver="1.2", atten_type="mcf7", probe_source_file="180905 Human Whole Transcriptome 1.2 Manifest.xlsx", probe_source_date="2018-09-05T00:00:00Z", probe_source_rcv="2019-07-15T13:24:12Z", probe_ncct_file="httr_mcf7_pilot_probe.csv", probe_ncct_date="2019-09-23T13:44:50.419Z" , fasta_file="/share/projects/HTTr/HTTr_pipeline_dev/HumanWT_v1/AlignCount/genome/humanWT_v1.2.fa", anno_type="refseq", anno_date="2018-09-05T00:00:00Z", db_host=NULL, db_name=NULL, output_dir = ""){
   
   #validate each field/parameter
   

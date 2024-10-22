@@ -3,7 +3,9 @@
 #' @param mean_cnt (\emph{numeric})
 #' @param plate_effect (\emph{character})
 #' @param shrinkage (\emph{character})
+#' @param ... = Additional parameters to be used and incorporated into the generated name
 #' @export getAnlName
+#' @return concatenated string including each passed parameter name and value separated by '_'
 
 getAnlName <- function(mean_cnt=getOption("mean_cnt"), plate_effect=F, shrinkage="normal", ...) {
   extra_opts <- list(...)
@@ -34,7 +36,7 @@ insertOneDEG <- function(DB=NULL, deg_doc=NULL,
                          db_host=NULL, db_name=NULL, collection="httr_deg", 
                          init_note="initial run", update_note=NULL,
                          rerun=FALSE, debug=getOption("debug",default=FALSE),
-                         output_dir = "not_set"
+                         output_dir = ""
 ) {
   # Stop if deg_doc is NULL
   if(is.null(deg_doc)) {
@@ -128,14 +130,14 @@ insertOneDEG <- function(DB=NULL, deg_doc=NULL,
 #' @param rerun (\emph{logical}) = Whether to re-run the insertion of this data and override existing doc with matching trt_grp_id, anl_name
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
-#' ... = Additional params passed to insertOneDEG
+#' @param ... = Additional params passed to insertOneDEG
 #' @export insertManyDEG
 #' @return (\emph{integer}) = Number of documents successfully inserted
 
 insertManyDEG <- function(DB=NULL, deg_docs=NULL, 
                           db_host=NULL, db_name=NULL, collection="httr_deg", 
                           rerun=FALSE, debug=getOption("debug",default=FALSE), 
-                          output_dir = "not_set", ...
+                          output_dir = "", ...
 ) {
   # Stop if deg_docs is NULL
   if(is.null(deg_docs)) {
@@ -224,14 +226,24 @@ flattenDEG <- function(deg_doc) {
     deg_doc$degs <- degFrame(deg_doc$degs)
   }
   # Append standard fields to front columns
-  degTbl <- cbind(
-    trt_grp_id=deg_doc$trt_grp_id, 
-    anl_name=deg_doc$anl_name,
-    anl_opt=as.character(toJSON(deg_doc$anl_opt, auto_unbox = T)),
-    run_time=deg_doc$run_time,
-    update_notes=as.character(toJSON(deg_doc$update_notes, auto_unbox=T)),
-    deg_doc$degs
-  )
+  if ("run_time" %in% names(deg_doc) && "update_notes" %in% names(deg_doc)){
+    degTbl <- cbind(
+      trt_grp_id=deg_doc$trt_grp_id, 
+      anl_name=deg_doc$anl_name,
+      anl_opt=as.character(toJSON(deg_doc$anl_opt, auto_unbox = T)),
+      run_time=deg_doc$run_time,
+      update_notes=as.character(toJSON(deg_doc$update_notes, auto_unbox=T)),
+      deg_doc$degs
+    )
+  }
+  else{
+    degTbl <- cbind(
+      trt_grp_id=deg_doc$trt_grp_id, 
+      anl_name=deg_doc$anl_name,
+      anl_opt=as.character(toJSON(deg_doc$anl_opt, auto_unbox = T)),
+      deg_doc$degs
+    )
+  }
   # Handle any extra columns that are atomic for now
   extra_cols <- setdiff(names(deg_doc), c("degs", colnames(degTbl)))
   for(j in extra_cols) {
@@ -258,14 +270,14 @@ flattenDEG <- function(deg_doc) {
 #' @param warn_anl (\emph{logical}) = When TRUE: If query returns documents with a mix of anl_name values, issue a warning
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
-#' ... = All other params are passed to mongoQuery to build the filtering query
+#' @param ... = All other params are passed to mongoQuery to build the filtering query
 #' @import data.table
 #' @return (\emph{list} or \emph{data.frame}) = When single & !flatten, this is a list matching httr_deg schema; when !single & !flatten, this is a list of lists with multiple httr_deg docs; when flatten, this is a data.frame
 #' @export getDEGs
 
 getDEGs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_deg", 
                     single=F, flatten=F, warn_count=100, warn_stype=T, warn_anl=T,
-                    debug=getOption("debug",default=FALSE), output_dir = "not_set",
+                    debug=getOption("debug",default=FALSE), output_dir = "",
                     ...
 ) {
 
@@ -336,7 +348,7 @@ getDEGs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_deg",
 
 #' getFCmatrix - Pull out DESeq2 results for multiple contrasts from httr_deg collection and reshape into wide matrix
 #' 
-#' @param host (\emph{character}) = Specifies the host to open a connection to
+#' @param db_host (\emph{character}) = Specifies the host to open a connection to
 #' @param db_name (\emph{character}) = Specifies the DB name to connect to
 #' @param collections (\emph{named character vector}) = Optional vector to re-map collection names used, where name=default collection; value=new collection name
 #' @param anl_name (\emph{character}) = Which analysis configuration to pull results for, default: based on mean_cnt, plate_effect, and shrinkage params, but setting here takes precedence
@@ -347,7 +359,7 @@ getDEGs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_deg",
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
 #' @param threads (\emph{integer}) = number of threads to use to parallelize
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
-#' ... = All other params are passed to mongoQuery to provide additional filtering (if chem_id is not specific enough, this will generate an error)
+#' @param ... = All other params are passed to mongoQuery to provide additional filtering (if chem_id is not specific enough, this will generate an error) and that will be passed to getDEGs and used for additional filtering
 #' @export getFCmatrix
 #' @import foreach
 #' @return (\emph{list of data.frame}) = First member $fc is matrix of contrast (rows) x probe (col), Second member $cmp is matrix of contrast (rows) x meta-data columns, both in same row order. Missing probes will be NA.
@@ -356,7 +368,7 @@ getFCmatrix <- function(db_host, db_name, collections=character(0),
                         anl_name=getAnlName(mean_cnt=mean_cnt, plate_effect=plate_effect, shrinkage=shrinkage), 
                         mean_cnt=getOption("mean_cnt"), plate_effect=T, shrinkage="normal",
                         stype="test sample", debug=getOption("debug",default=FALSE),threads=-1,
-                        output_dir = "not_set", ...
+                        output_dir = "", ...
 ) {
 
   libs = c('foreach', 'stats', 'doParallel')
@@ -602,4 +614,71 @@ getFCmatrix <- function(db_host, db_name, collections=character(0),
     parallel::stopCluster(my.cluster) 
   # Return fc and cmp
   return(list(fc=fc, cmp=cmp))
+}
+
+
+#' getFCMAT1 - Pull out DESeq2 results for multiple contrasts from httr_deg collection and reshape into wide matrix
+#' 
+#' @param db_host (\emph{character}) = Specifies the host to open a connection to
+#' @param db_name (\emph{character}) = Specifies the DB name to connect to
+#' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
+#' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
+#' ... = All other params are passed to mongoQuery to provide additional filtering (if chem_id is not specific enough, this will generate an error)
+#' @export getFCMAT1
+#' @return data.frame of all the httr_deg docs
+
+
+getFCMAT1 <- function(DB=NULL, db_host=NULL, db_name=NULL, debug=getOption("debug",default=FALSE), output_dir="", ...){
+
+
+  # setup mongoDB connection
+  httr_chem_connection <- openMongo(
+      db_host = db_host,
+      db_name = db_name,
+      collection = "httr_chem",
+      output_dir = output_dir
+  )
+  # get chem_ids for full db
+  httr_chem <- httr_chem_connection$find()
+  
+  extra_opts <- list(...)
+  mean_cnt <- 5
+  plate_effect <- 1
+  shrinkage <- "normal"
+  
+  if ("mean_cnt" %in% names(extra_opts))
+    mean_cnt <- extra_opts["mean_cnt"]
+  if ("plate_effect" %in% names(extra_opts))
+    plate_effect <- extra_opts["plate_effect"]
+  if ("shrinkage" %in% names(extra_opts))
+    shrinkage <- extra_opts["shrinkage"]
+  
+  FCMAT1 <- getDEGs(
+      db_host = db_host,
+      db_name = db_name,
+      flatten = TRUE,
+      chem_id = httr_chem$chem_id,
+      anl_name = getAnlName(mean_cnt=mean_cnt, plate_effect=plate_effect, shrinkage=shrinkage),
+      ...
+  )                                      
+                      
+  # add in missing columns via chemical manifest
+  FCMAT1$dtxsid <- httr_chem$dtxsid[match(FCMAT1$chem_id, httr_chem$chem_id)]
+  FCMAT1$chem_name <- httr_chem$chem_name[match(FCMAT1$chem_id, httr_chem$chem_id)]
+  
+  # add in gene-level annotations via probe manifest
+  probes <- getProbeManifest(
+      db_host = db_host,
+      db_name = db_name,
+      output_dir = output_dir
+  )
+  
+  # rename other columns to match expected FCMAT2 names
+  
+  FCMAT1$gene_symbol <- probes$gene_symbol[match(FCMAT1$probe_id, probes$probe_name)]
+  colnames.old <- c("trt_grp_id", "log2FoldChange", "lfcSE", "gene_symbol")
+  colnames.new <- c("sample_key", "l2fc", "se", "gene")
+  colnames(FCMAT1)[which(colnames(FCMAT1) %in% colnames.old)] <- colnames.new
+  return(FCMAT1)
+
 }

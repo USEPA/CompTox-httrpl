@@ -110,7 +110,7 @@ def buildSampleWell(DB: pymongo.MongoClient,
     """
     # First check if sample_id in httr_well:
     httr_well = DB[collection]
-    if db_insert and (httr_well.count({"sample_id": sample_id}) > 0):
+    if db_insert and (httr_well.count_documents({"sample_id": sample_id}) > 0):
         if rerun:
             log.write(
                 "Replacing %s data for sample_id=%s" %
@@ -341,7 +341,7 @@ def countFlags(
     flag_vals = httr_well.distinct("qc_flag")
     flag_counts = {}
     for x in flag_vals:
-        flag_counts[x] = httr_well.count({"qc_flag": x})
+        flag_counts[x] = httr_well.count_documents({"qc_flag": x})
     return flag_counts
 
 # TO DO: Fill out this function

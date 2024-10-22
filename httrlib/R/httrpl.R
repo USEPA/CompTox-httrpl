@@ -37,7 +37,7 @@ qcBatch <- function(db_host, db_name,
   max_gini_coef = get_global_option("max_gini_coef"),
   qc_flags = get_global_option("qc_flags"),   
   debug=getOption("debug", default=FALSE),
-  output_dir = "not_set",
+  output_dir = "",
   ...
 ) {
 
@@ -150,7 +150,7 @@ updateqcFlags <- function(db_host, db_name, db_collection="httr_counts_qc",
   max_gini_coef = get_global_option("max_gini_coef"),
   qc_flags = get_global_option("qc_flags"), 
   debug=getOption("debug", default=FALSE),
-  output_dir = "not_set",
+  output_dir = "",
   ...
 ) {
 

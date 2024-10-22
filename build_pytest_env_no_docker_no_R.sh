@@ -10,7 +10,8 @@ then
 fi
 
 . venv_httr_app/bin/activate
-pip install pymongo==3.6.1
+pip install importlib-metadata==4.8.3
+pip install pymongo==3.13.0
 pip install mongoengine
 pip install deepdiff
 pip install pandas

@@ -1,6 +1,6 @@
 Package: httrlib
 Title: pipeline for automated in vitro screening platform 
-Version: 0.7.5
+Version: 0.7.6
 Authors@R: 
     person("Logan", "Everett", , "everett.logan@epa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))

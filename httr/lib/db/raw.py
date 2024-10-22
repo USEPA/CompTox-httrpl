@@ -272,7 +272,7 @@ def getReadLenRaw(
     # Make sure there is one document matching sample_id
     sid_query = {"sample_id": sample_id}
     httr_raw = DB[collection]
-    sid_count = httr_raw.count(sid_query)
+    sid_count = httr_raw.count_documents(sid_query)
     if sid_count < 1:
         log.warning(
             "No documents in %s matched sample_id:%s" %

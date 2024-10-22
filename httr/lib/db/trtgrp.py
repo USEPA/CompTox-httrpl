@@ -118,7 +118,7 @@ def treatGroupFromSamples(
             # subsequent suffixes
             get_name_wells = get_all_wells
     # Check if this is in DB already (db_insert=True only)
-    if db_insert and (httr_trt_grp_cmp.count(dict(trt_grp_id=trt_grp_id)) > 0):
+    if db_insert and (httr_trt_grp_cmp.count_documents(dict(trt_grp_id=trt_grp_id)) > 0):
         if rerun:
             # If rerun=True, just delete the existing entry
             deleteByID(

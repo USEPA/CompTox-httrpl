@@ -376,10 +376,10 @@ def check_and_build_httr_probe(DB):
     '''
     HTTR_PROBE_DOC_NB = 21111
     print(
-        f"DB['httr_probe'].count is {DB['httr_probe'].count({},{})}",
+        f"DB['httr_probe'].count is {DB['httr_probe'].count_documents({},{})}",
         flush=True)
     if 'httr_probe' not in DB.list_collection_names(
-    ) or DB['httr_probe'].count({}, {}) != HTTR_PROBE_DOC_NB:
+    ) or DB['httr_probe'].count_documents({}, {}) != HTTR_PROBE_DOC_NB:
         if 'httr_probe' in DB.list_collection_names():
             print("dropping httr_probe", flush=True)
             DB['httr_probe'].drop()

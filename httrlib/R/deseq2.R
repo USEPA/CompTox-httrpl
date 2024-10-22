@@ -247,6 +247,7 @@ check_collection_remapped <- function(collections){
 #' @param threads (\emph{integer}) = Number of threads to use for core DESeq2 functions, defaults to 1 (no multi-threading)
 #' @param collections (\emph{named character vector}) = Optional vector to re-map collection names used, where name=default collection; value=new collection name
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
+#' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @export extract_and_run
 #' @return vector of my_results, chemTrts, trt_grp_name
 
@@ -256,13 +257,14 @@ extract_and_run <- function(chem_id, db_host, db_name,
                                  min_colsum=getOption("min_colsum"), mean_cnt=getOption("mean_cnt"),
                                  plate_effect=F, shrinkage="normal", threads=1,
                                  collections=character(0),
-                                 debug=getOption("debug",default=FALSE)){
+                                 debug=getOption("debug",default=FALSE),
+                                 output_dir = ""){
 
 
 
 
   # Extract httr_trt_grp_cmp for chem_id, pg_id, media, timeh - check max_dose_level
-  chemTrts <- getChemTrts(chem_id=chem_id, db_host=db_host, db_name=db_name, collection=collections["httr_trt_grp_cmp"], pg_id=pg_id, media=media, timeh=timeh, max_dose_level=max_dose_level, debug=debug)
+  chemTrts <- getChemTrts(chem_id=chem_id, db_host=db_host, db_name=db_name, collection=collections["httr_trt_grp_cmp"], pg_id=pg_id, media=media, timeh=timeh, max_dose_level=max_dose_level, debug=debug, output_dir=output_dir)
   if(!sameCtrlWells(chemTrts, debug=debug)) {
     warning("Extracted ", length(chemTrts), " docs from httr_trt_grp_cmp that were expected to correspond to a chemical dose-response series, but the control wells differ for some treatments.\n")
   }
@@ -329,12 +331,13 @@ extract_and_run <- function(chem_id, db_host, db_name,
 #' @param rerun (\emph{logical}) = Whether to re-run the DB insertion if results are in there already (ideally this should check the DB before running...)
 #' @param note (\emph{character}) = Overwrite default note fields for insert if this is specified.
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
+#' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @import jsonlite
 #' @export format_for_db_insert
 #' @return (\emph{data.frame}) = Contains DESeq2 results for all treatments in the dose-response series
 
 
-format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect, shrinkage, collections, db_host, db_name, note, rerun, debug, db_insert){
+format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect, shrinkage, collections, db_host, db_name, note, rerun, debug, db_insert, output_dir = ""){
 
   my_results <- extract_and_run_return[[1]]
   chemTrts <- extract_and_run_return[[2]]
@@ -376,20 +379,20 @@ format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect,
     # Check for mismatch in trt_name
     # FIXED ON 8/11/20 - Use the trt_grp_name mapping created above
     if(!all(my_results[[1]]$trt_name %in% trt_grp_name[names(chemDEG)])) {
-      warning("Not all DEG results are being inserted into DB.\n")
+      warning("Not all DEG results are being inserted.\n")
     }
     if(sum(unlist(lapply(chemDEG, function(x){nrow(x$degs)}))) != nrow(my_results[[1]])) {
-      warning("Total DEGs for DB insert does not add up to total DESeq2 results.\n")
+      warning("Total DEGs for insert does not add up to total DESeq2 results.\n")
     }
     if(any(unlist(lapply(chemDEG, function(x){nrow(x$degs)})) == 0)) {
-      warning("Some DEG result docs for DB have empty $degs table.\n")
+      warning("Some DEG result docs have empty $degs table.\n")
     }
     
     # Insert into DB - with or without modified notes:
     if(is.null(note)) {
-      insertManyDEG(deg_docs=chemDEG, db_host=db_host, db_name=db_name, collection=collections["httr_deg"], rerun=rerun, debug=debug)
+      insertManyDEG(deg_docs=chemDEG, db_host=db_host, db_name=db_name, collection=collections["httr_deg"], rerun=rerun, debug=debug, output_dir=output_dir)
     } else {
-      insertManyDEG(deg_docs=chemDEG, db_host=db_host, db_name=db_name, collection=collections["httr_deg"], rerun=rerun, init_note = note, update_note = note, debug=debug)
+      insertManyDEG(deg_docs=chemDEG, db_host=db_host, db_name=db_name, collection=collections["httr_deg"], rerun=rerun, init_note = note, update_note = note, debug=debug, output_dir=output_dir)
     }
   }
   
@@ -423,6 +426,7 @@ format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect,
 #' @param rerun (\emph{logical}) = Whether to re-run the DB insertion if results are in there already (ideally this should check the DB before running...)
 #' @param note (\emph{character}) = Overwrite default note fields for insert if this is specified.
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
+#' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @import jsonlite
 #' @export runDESeq2ForChemCond
 #' @return (\emph{data.frame}) = Contains DESeq2 results for all treatments in the dose-response series
@@ -433,8 +437,7 @@ runDESeq2ForChemCond <- function(chem_id, db_host, db_name,
                                  min_colsum=10^5, mean_cnt=getOption("mean_cnt"),
                                  plate_effect=F, shrinkage="normal", threads=1,
                                  collections=character(0), db_insert=T, rerun=F, note=NULL,
-                                 debug=getOption("debug",default=FALSE)
-) {
+                                 debug=getOption("debug",default=FALSE),output_dir="") {
   
   
   collections <- check_collection_remapped(collections)
@@ -443,9 +446,9 @@ runDESeq2ForChemCond <- function(chem_id, db_host, db_name,
                                  pg_id, media, timeh, max_dose_level,
                                  min_colsum, mean_cnt,
                                  plate_effect, shrinkage, threads,
-                                 collections, debug)
+                                 collections, debug, output_dir=output_dir)
                                  
-  return(format_for_db_insert(extract_and_run_return, mean_cnt, plate_effect, shrinkage, collections, db_host, db_name, note, rerun, debug, db_insert))
+  return(format_for_db_insert(extract_and_run_return, mean_cnt, plate_effect, shrinkage, collections, db_host, db_name, note, rerun, debug, db_insert, output_dir))
   
   
 }
@@ -478,7 +481,7 @@ runDESeq2Single <- function(trt_grp_id, db_host, db_name,
                             plate_effect=F, shrinkage="normal", threads=1,
                             collections=character(0), db_insert=T, rerun=F, note=NULL,
                             debug=getOption("debug",default=FALSE), 
-                            output_dir = "not_set", ...
+                            output_dir = "", ...
 ) {
   # Check if any collections are re-mapped, fill in defaults for everything else
   # TO DO: This could be useful to put in a separate function for all functions that need to access multiple collections
@@ -497,7 +500,7 @@ runDESeq2Single <- function(trt_grp_id, db_host, db_name,
   # Extract counts for all relevant wells
   my_samples <- trtGrpWells(testTrt)
   #my_counts <- getWellCounts(sample_ids=my_samples, db_host=db_host, db_name=db_name, collection=collections["httr_well"], debug=debug)
-  my_counts <- getWellCounts(sample_id=my_samples, db_host=db_host, db_name=db_name, collection=collections["httr_well"], debug=debug)
+  my_counts <- getWellCounts(sample_id=my_samples, db_host=db_host, db_name=db_name, collection=collections["httr_well"], debug=debug, output_dir = output_dir)
   COUNTS <- my_counts$counts
   CONDS <- my_counts$treatments
   

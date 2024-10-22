@@ -69,10 +69,10 @@ def test_qcBatch_filter(calibrate):
         DB[exp.expected["data/expected_counts_qc_filter.json"]["coll_name"]].drop()
     
         # add/remove document into/from httr_well_trt if needed
-        if DB.httr_well_trt.count({'sample_id': 'TC00283151_D21_2'}) == 0:
+        if DB.httr_well_trt.count_documents({'sample_id': 'TC00283151_D21_2'}) == 0:
             print('inserting TC00283151_D21_2 into httr_well_trt collection')
             DB.httr_well_trt.insert_one({'sample_id': 'TC00283151_D21_2'})
-        if DB.httr_well_trt.count({'sample_id': 'TC00283151_C16_2'}) != 0:
+        if DB.httr_well_trt.count_documents({'sample_id': 'TC00283151_C16_2'}) != 0:
             print('removing TC00283151_C16_2 from httr_well_trt collection')
             DB.httr_well_trt.delete_many({'sample_id': 'TC00283151_C16_2'})
     

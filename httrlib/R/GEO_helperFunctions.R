@@ -15,7 +15,7 @@
 #'
 #' @return GEOmetadata, a table
 
-getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character(0), procFile=' ', vehicle_control = "DMSO", cell_line = NULL, output_dir="not_set", ...){
+getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character(0), procFile=' ', vehicle_control = "DMSO", cell_line = NULL, output_dir="", ...){
 
   def_collections <- c("httr_well_trt", "httr_well", "httr_chem", "httr_raw")
   def_collections <- setdiff(def_collections, names(collections))
@@ -128,29 +128,27 @@ getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character
   #source name is 'stype' fields and/or 'MCF7 Cells', user can update as needed after running the function
   GEO_metadata[, `source name` := stype]
 
-  if(is.null(GEO_metadata$cell_line)){
+  if(!is.null(GEO_metadata$cell_type)){
     GEO_metadata[`source name` == "vehicle control" | `source name` == "untreated control" | `source name` == "test sample" | `source name` == "reference chemical" | str_detect(`title`, "BL_"), `source name` := paste(cell_type, "Cells", sep = " ")]
   } else{
     GEO_metadata[`source name` == "vehicle control" | `source name` == "untreated control" | `source name` == "test sample" | `source name` == "reference chemical" | str_detect(`title`, "BL_"), `source name` := paste(cell_line, "Cells", sep = " ")]
-
   }
 
   #organism is 'Homo sapiens'
   GEO_metadata[, organism := "Homo sapiens"]
 
   #char cell line is taken from the cell_type column of httr_well if it exists, else use the defined value
-  if(is.null(GEO_metadata$cell_line)){
+  if(!is.null(GEO_metadata$cell_type)){
     GEO_metadata[, "characteristics: cell line" := ifelse(rna_src == "Plated Cells" | rna_src == "Bulk Lysate", cell_type, NA)]
-
   } else{
     GEO_metadata[, "characteristics: cell line" := ifelse(rna_src == "Plated Cells" | rna_src == "Bulk Lysate", cell_line, NA)]
   }
 
   #char media is 'media' for cell lysate samples and blank for everything else and can be changed by user if more information is needed
-  if(is.null(GEO_metadata$media)){
-    GEO_metadata[, "characteristics: media"] <- NA
-  } else {
+  if(!is.null(GEO_metadata$media)){
     GEO_metadata[, "characteristics: media" := media]
+  } else {
+    GEO_metadata[, "characteristics: media" := NA]
     }
 
   #char treatment is '*timeh*h exposure of *conc* uM *chem_name*'
@@ -195,7 +193,6 @@ getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character
   #GEO_metadata[, `characteristics: exposure time` := ifelse(`characteristics: cell line` == "MCF7", "6h", NA)]
   if(!is.null(GEO_metadata$timeh)){
     GEO_metadata[, `characteristics: exposure time` := ifelse(is.na(timeh), NA, paste0(timeh, "h"))]
-
   }
   GEO_metadata[rna_src != "Plated Cells" & rna_src != "Bulk Lysate", `characteristics: exposure time` := NA]
 
@@ -249,7 +246,7 @@ getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character
 #' @export getSRAMetadata
 #' @return csv containing BioSample metadata needed for an SRA submission.
 
-getSRAMetadata <- function(db_host= NULL, db_name = NULL, title = "", collections=character(0), library_strategy = "RNA-seq", library_source = "TRANSCRIPTOMIC", library_selection="cDNA", library_layout="Single", platform="ILLUMINA", instrument_model= "", design_description= "",  filetype="fastq", output_dir="not_set", ...){
+getSRAMetadata <- function(db_host= NULL, db_name = NULL, title = "", collections=character(0), library_strategy = "RNA-seq", library_source = "TRANSCRIPTOMIC", library_selection="cDNA", library_layout="Single", platform="ILLUMINA", instrument_model= "", design_description= "",  filetype="fastq", output_dir="", ...){
 
   def_collections <- c("httr_well", "httr_raw")
   def_collections <- setdiff(def_collections, names(collections))
@@ -370,11 +367,11 @@ getSRAMetadata <- function(db_host= NULL, db_name = NULL, title = "", collection
 #' @param Age character string: 	age at the time of sampling; relevant scale depends on species and study
 #' @param biomaterial_provider character string: name and address of the lab or PI, or a culture collection identifier, 'US EPA,109 T.W. Alexander Drive, Durham, NC, 27709' by default
 #' @param collection_date character string: the date on which the sample was collected
-#' @param gen_loc_name character string: geographical origin of the sample,  'USA: Durham, North Carolina' by default
+#' @param geo_loc_name character string: geographical origin of the sample,  'USA: Durham, North Carolina' by default
 #' @param Sex character string: chromosomal sex of the sampled organism
 #' @param Tissue character string: the type of tissue the sample was taken from
 #' @param vehicle_control character: the vehicle control used in the study; default is DMSO. Note column values for the vehicle as these may need to be changed.
-#' @param cell_line character string: the cell line used in the study; default is NULL. If NULL, function will use the value in the httr_well collection.
+#' @param Cell_line character string: the cell line used in the study; default is NULL. If NULL, function will use the value in the httr_well collection.
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @param ... additional queries to be passed to mongoQuery
 #' @importFrom stringr str_detect
@@ -383,7 +380,7 @@ getSRAMetadata <- function(db_host= NULL, db_name = NULL, title = "", collection
 #'
 #' @return csv containing BioSample metadata needed for an SRA submission.
 
-getSRABioSampleMetadata <- function(db_host = NULL, db_name = NULL, collections=character(0), Organism = 'Homo sapiens', Isolate = 'not applicable', Age = 'not applicable', biomaterial_provider = 'US EPA,109 T.W. Alexander Drive, Durham, NC, 27709', collection_date = 'not applicable', gen_loc_name = 'USA: Durham, North Carolina', Sex = 'not applicable', Tissue = 'not applicable', vehicle_control = 'DMSO', cell_line = NULL, output_dir="not_set", ...){
+getSRABioSampleMetadata <- function(db_host = NULL, db_name = NULL, collections=character(0), Organism = 'Homo sapiens', Isolate = 'not applicable', Age = 'not applicable', biomaterial_provider = 'US EPA,109 T.W. Alexander Drive, Durham, NC, 27709', collection_date = 'not applicable', geo_loc_name = 'USA: Durham, North Carolina', Sex = 'not applicable', Tissue = 'not applicable', vehicle_control = 'DMSO', Cell_line = NULL, output_dir="", ...){
 
   def_collections <- c("httr_well_trt", "httr_well", "httr_chem", "httr_raw")
   def_collections <- setdiff(def_collections, names(collections))
@@ -470,17 +467,17 @@ getSRABioSampleMetadata <- function(db_host = NULL, db_name = NULL, collections=
 
   #Define column names for GEO metadata table
   SRA_columns <- c("sample_name", "organism", "isolate",
-                   "age", "biomaterial_provider", "collection_date", "gen_loc_name",
+                   "age", "biomaterial_provider", "collection_date", "geo_loc_name",
                    "sex", "tissue", "cell_line",
                    "sample_type", "treatment", "chemical_name", "chemical_ID",
                    "chemical_concentration")
 
 
-  BioSample_metadata <- data.table(`Sample name` = "", organism = Organism, isolate = Isolate,
-                                   age = Age, `biomaterial provider` = biomaterial_provider, `collection date` = collection_date, `gen location name` = gen_loc_name,
-                                   sex = Sex, tissue = Tissue, `cell line` = "",
-                                   `sample type` = "", treatment = "", `chemical name` = "", `chemical ID` = "",
-                                   `chemical concentration` = "")
+  BioSample_metadata <- data.table(sample_name = "", organism = Organism, isolate = Isolate,
+                                   age = Age, biomaterial_provider = biomaterial_provider, collection_date = collection_date, geo_loc_name = geo_loc_name,
+                                   sex = Sex, tissue = Tissue, cell_line = "",
+                                   sample_type = "", treatment = "", chemical_name = "", chemical_ID = "",
+                                   chemical_concentration = "")
   colnames(BioSample_metadata) <- SRA_columns
 
   BioSample_metadata <- data.table(BioSample_metadata, db_meta)
@@ -495,22 +492,22 @@ getSRABioSampleMetadata <- function(db_host = NULL, db_name = NULL, collections=
 
 
   #cell_line is taken from the cell_type column of httr_well if it exists, else use the defined value
-  if(is.null(BioSample_metadata$cell_line)){
-    BioSample_metadata[, "cell_line" := cell_type] #since cell_type has already been formatted correctly
+  if(!is.null(BioSample_metadata$cell_type)){
+    BioSample_metadata[, cell_line := cell_type] #since cell_type has already been formatted correctly
   } else{
-    BioSample_metadata[, "cell_line" := cell_line] #use provided value
+    BioSample_metadata[, cell_line := Cell_line] #use provided value
   }
-  BioSample_metadata[rna_src != "Plated Cells" & rna_src != "Bulk Lysate", "cell_line" := NA]
+  BioSample_metadata[rna_src != "Plated Cells" & rna_src != "Bulk Lysate", cell_line := NA]
 
   #treatment is '*timeh*h exposure of *conc* *conc_unit* *chem_name*'
   if(is.null(BioSample_metadata$timeh) & is.null(BioSample_metadata$conc)){
-    BioSample_metadata[, "characteristics: treatment" := chem_name]
+    BioSample_metadata[, treatment := chem_name]
   } else if (is.null(BioSample_metadata$timeh)){
-    BioSample_metadata[, "characteristics: treatment" := paste("exposure of", conc, " uM of ", chem_name, sep = "")]
+    BioSample_metadata[, treatment := paste("exposure of", conc, " uM of ", chem_name, sep = "")]
   } else if (is.null(BioSample_metadata$conc)){
-    BioSample_metadata[, "characteristics: treatment" := paste(timeh, "h exposure of", chem_name, sep = "")]
+    BioSample_metadata[, treatment := paste(timeh, "h exposure of", chem_name, sep = "")]
   } else{
-    BioSample_metadata[, "characteristics: treatment":= paste(timeh, "h exposure of ", conc, " uM of ", chem_name, sep = "")] #give everything the standard convention
+    BioSample_metadata[, treatment:= paste(timeh, "h exposure of ", conc, " uM of ", chem_name, sep = "")] #give everything the standard convention
   }
   BioSample_metadata[stype == "vehicle control", treatment := "0.5% DMSO vehicle control"] #default value; can be changed after running function
   BioSample_metadata[stype == "QC sample" & rna_src != "Bulk Lysate", treatment := "untreated"]
@@ -541,7 +538,7 @@ getSRABioSampleMetadata <- function(db_host = NULL, db_name = NULL, collections=
   #make all fields equal to what's in dose_level
   BioSample_metadata[stype == "vehicle control", dose_level := 0]
 
-  BioSample_metadata <- BioSample_metadata[, which((names(BioSample_metadata) %in% c(SRA_columns, "dose_level", "trt_name"))==TRUE), with = FALSE] #add dose_level and trt_name
+  BioSample_metadata <- BioSample_metadata[, which((names(BioSample_metadata) %in% c(SRA_columns, "dose_level", "trt_name", "plate_id", "well_id"))==TRUE), with = FALSE] #add dose_level, trt_name, plate_id, and well_id
 
   #Return the formatted data table
   return(BioSample_metadata)

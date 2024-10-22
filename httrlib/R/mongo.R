@@ -39,7 +39,7 @@ mongoURL <- function(db_host, user, passwd, db_name, authSource=NULL, authMechan
 #' @return nothing
 #' @export check_collection_exists
 
-check_collection_exists <- function (db_host, db_name, collection, output_dir = "not_set"){
+check_collection_exists <- function (db_host, db_name, collection, output_dir = ""){
 
   # have to connect to a collecion that may not exist to scan for db collections!
   target_col  <- openMongo(db_host=db_host, db_name = db_name, collection= collection, output_dir = output_dir)
@@ -69,11 +69,11 @@ check_collection_exists <- function (db_host, db_name, collection, output_dir = 
 
 
 openMongo <- function(db_host=getOption("DB_HOST"), user=NULL, passwd=NULL, 
-  db_name=NULL, collection=NULL, authSource = NULL, authMechanism = NULL, check_collection_present=FALSE, output_dir = "not_set", verbose = FALSE) {
+  db_name=NULL, collection=NULL, authSource = NULL, authMechanism = NULL, check_collection_present=FALSE, output_dir = "", verbose = FALSE) {
 
   #let's read the mongo/nomongo global variable value
-  if (output_dir == "not_set")
-    output_dir = getOption("output_dir")
+  if (output_dir == "")
+    output_dir = getOption("output_dir", default="")
   if(!is.null(output_dir) && output_dir != "") {    
     json_DB_collection_instance  <- json_DB_collection$new(output_dir=output_dir, name = collection, verbose = verbose)
     if (check_collection_present)
@@ -340,6 +340,7 @@ insertByID <- function(DB, docs, id_field="sample_id", rerun=FALSE, debug=getOpt
 #' @export mongoQuery
 #' @param  ... (any) = Any set of named parameters OR a single named list of all arguments
 #' @import jsonlite
+#' @return json formated query string corresponding to optional arguments passed
 
 mongoQuery <- function(...) {
   # Get all args as a list:
@@ -381,12 +382,12 @@ mongoQuery <- function(...) {
 #' @param collection (\emph{character}) = If DB is NULL, this specifies the collection to connect to
 #' @param id_field (\emph{character}) = What field in the DB to return IDs from, defaults to the generic mongo _id field
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
-#' ... = All additional params passed to mongoQuery to form the query string
+#' @param ... = All additional params passed to mongoQuery to form the query string
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @export findIDs
 #' @return (character vector) = The ID values returned by DB$distinct call
 
-findIDs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection=NULL, id_field="_id", debug=getOption("debug", default=FALSE), output_dir="not_set", ...) {
+findIDs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection=NULL, id_field="_id", debug=getOption("debug", default=FALSE), output_dir="", ...) {
   # Open DB connection if an open connection object was not provided
   if(is.null(DB)) {
     if(debug) {cat("Opening new connection to ", db_host, "/", db_name, ".", collection, "\n", sep="")}
@@ -429,7 +430,7 @@ as.mongo.date <- function(x) {
 #' @return (\emph{mongo object}) a mongo 'environment', i.e. a DB object
 #' @export getDB
 
-getDB <- function(DB=NULL, db_host=NULL, db_name=NULL, collection=NULL, output_dir="not_set", verbose = FALSE){
+getDB <- function(DB=NULL, db_host=NULL, db_name=NULL, collection=NULL, output_dir="", verbose = FALSE){
 
   if(is.null(DB)) {
     DB = openMongo(db_host=db_host, db_name=db_name, collection=collection, output_dir=output_dir, verbose = verbose)
@@ -459,7 +460,7 @@ iterate <- function(DB=NULL,query=NULL,fields=NULL){
 #' title Find : with DB object as well as fields and potentially query named list, inquire db for matching documents
 #' @param  DB (\emph{mongo object}) = Opened connection to specific Mongo Database and Collection
 #' @param optional fields: json list of fields to be included in our search
-#' other parameter (optional): query JSON query to use when querying the db
+#' @param ... = Any additional parameters are passed to mongoQuery to constrain the query
 #' @return list of documents matching search specified by query/fields
 
 Find <- function(DB=NULL, ...){

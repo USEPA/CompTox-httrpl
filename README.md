@@ -34,7 +34,7 @@ All code in this package has been tested on Python 3.6 - compatibility with newe
 
 Once Python 3 and associated pip tool is installed, the following python libraries should be installed for the individual user:
 ```bash
-pip3 install --user pandas pymongo mongoengine
+pip3 install --user pandas pymongo==3.13.0 mongoengine
 ```
 
 
@@ -180,6 +180,16 @@ python3 align_and_count.py (localpath)/path/to/example_config.json &> (localpath
 
 Version History
 ---------------
+
+**v0.7.6-public (10/22/24)**
+
++ `build_pytest_env_no_docker.sh` now adds to user's existing R library instead of creating a new location and starting fresh
++ Updated to use pymongo 3.13.0
++ Minor changes to `output_dir` parameter (leave blank for true MongoDB connection)
++ Added `getFCMAT1` function to pull data directly from an HTTr database and prepare it for input to [`httrpathway`](https://github.com/USEPA/CompTox-httrpathway) package
++ Minor improvements to functions for preparing GEO and SRA meta-data
++ Standardized parameters for specifying the host (`db_host`) and DB name (`db_name`)
++ Additional improvements to function documentation
 
 **v0.7.5-public (4/30/24)**
 

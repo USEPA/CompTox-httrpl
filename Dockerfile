@@ -41,7 +41,6 @@ RUN : \
     && $MAMBA_DIR/bin/micromamba shell init -s bash \
     && :
 
-RUN #echo micromamba activate >> /root/.bashrc
 RUN echo -n "auto_activate_base: True\nenvs_dirs:\n  - $MAMBA_DIR/envs\nchannels:\n  - conda-forge" > /root/.mambarc
 RUN ln -s /root/.mambarc /root/.condarc
 
@@ -51,37 +50,23 @@ RUN micromamba install -n base -y python=3.6.15 ncurses psutil -y
 # Activate environment by default
 SHELL ["mamba", "run", "-n", "base", "/bin/bash", "-c"]
 
+COPY docker_install_scripts/requirements.txt /workspace/requirements.txt
 # install required python packages
 RUN mamba install -c conda-forge ncurses psutil && \
-    pip install mongoengine==0.24.2 && \
-    pip install numpy==1.19.5 && \
-    pip install pandas==1.1.5 && \
-    pip install pymongo==3.13.0 && \
-    pip install jsonschema && \
-    pip install celery
+    pip install -r /workspace/requirements.txt
 
 # Set working directory
 WORKDIR /workspace
 
 # Copy R installation scripts and lists
-COPY package_loader.sh /workspace/package_loader.sh
+COPY --chmod=755 package_loader.sh requirements.r package_fixer.sh docker_install_scripts/httrlib_builder_no_pdf.sh docker_install_scripts/install_r.sh /workspace/
 COPY Rpackages /workspace/Rpackages
-COPY requirements.r /workspace/requirements.r
-COPY package_fixer.sh /workspace/package_fixer.sh
-COPY docker_install_scripts/httrlib_builder_no_pdf.sh /workspace/httrlib_builder_no_pdf.sh
-COPY docker_install_scripts/install_r.sh /workspace/install_r.sh
-
-# copy httrlib directory
 COPY httrlib /workspace/httrlib
 
-RUN chmod 755 install_r.sh && \
-    ./install_r.sh
+RUN ./install_r.sh
 
-COPY run_normalization_pipeline.sh /workspace/run_normalization_pipeline.sh
-
-RUN chmod 755 /workspace/run_normalization_pipeline.sh
-
-# copy httr directory last in case code changes happen
+# copy httr directory and normalization pipeline script last in case code changes happen
+COPY --chmod=755 run_normalization_pipeline.sh /workspace/run_normalization_pipeline.sh
 COPY httr /workspace/httr
 
 WORKDIR /workspace

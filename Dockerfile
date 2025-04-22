@@ -1,55 +1,72 @@
-FROM r-base:3.6.0 AS RBASE
+# Start from Ubuntu 24.04 base
+FROM ubuntu:24.04
 
-ADD httr httr
-ADD etc etc
-ADD httrlib httrlib
-ADD root root
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV MAMBA_DIR=/opt/micromamba
+ENV MAMBA_ROOT_PREFIX=$MAMBA_DIR
+ENV PATH=$MAMBA_DIR/bin:$PATH
 
-RUN cp /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/. \
-&& apt-get update && apt-get install -y gcc-9-base libgcc-9-dev libc6-dev libssl-dev libsasl2-dev libz-dev pkg-config libxml2 libcurl4-openssl-dev libxml2-dev \
-&& chmod 755 httr/scripts/package_loader.sh \
-&& httr/scripts/./package_loader.sh \
-&& Rscript httr/scripts/requirements.r \
-&& chmod 755 httr/scripts/package_fixer.sh \
-&& httr/scripts/./package_fixer.sh \
-&& chmod 755 httr/scripts/httrlib_builder_no_pdf.sh \
-&& httr/scripts/./httrlib_builder_no_pdf.sh \
-&& chmod 600 /etc/.passwd-s3fs 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    dirmngr \
+    gnupg \
+    wget \
+    curl \
+    ca-certificates \
+    build-essential \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libsasl2-dev \
+    libxml2-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    libgit2-dev \
+    r-base && \
+    rm -rf /var/lib/apt/lists/*
 
-FROM continuumio/miniconda3:4.10.3p0-alpine
+# Create the mamba install directory and install micromamba
+RUN : \
+    && mkdir -p $MAMBA_DIR/bin \
+    && curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba --to-stdout > $MAMBA_DIR/bin/micromamba \
+    && chmod +x $MAMBA_DIR/bin/micromamba \
+    && ln -s $MAMBA_DIR/bin/micromamba $MAMBA_DIR/bin/mamba \
+    && ln -s $MAMBA_DIR/bin/micromamba $MAMBA_DIR/bin/conda \
+    && $MAMBA_DIR/bin/micromamba shell init -s bash \
+    && :
 
-# needed for conda integration
-SHELL ["/bin/bash", "-c"]
+RUN echo -n "auto_activate_base: True\nenvs_dirs:\n  - $MAMBA_DIR/envs\nchannels:\n  - conda-forge" > /root/.mambarc
+RUN ln -s /root/.mambarc /root/.condarc
 
-RUN conda install -c conda-forge python=3.6 \
- && conda install -c bioconda samtools=1.09 \
- && conda install -c anaconda ncurses \
- && conda install -c biobuilds hisat2 \
- && conda install -c conda-forge pandas \
- && conda install -c conda-forge pymongo \
- && conda install -c conda-forge mongoengine \
- && conda install -c conda-forge s3fs-fuse \
- && conda install -c conda-forge pytest \
- && conda install -c conda-forge deepdiff \
- && conda install -c anaconda psutil\
- && pip install pytest-order \
- && pip install jsonschema \
- && pip install celery
+# Create a conda environment with Python 3.6.15 and install pip packages
+RUN micromamba install -n base -y python=3.6.15 ncurses psutil -y
 
-## change workdir to /
-WORKDIR /
+# Activate environment by default
+SHELL ["mamba", "run", "-n", "base", "/bin/bash", "-c"]
 
-COPY --from=0 . .
-RUN chmod 600 /etc/.passwd-s3fs
+COPY docker_install_scripts/requirements.txt /workspace/requirements.txt
+# install required python packages
+RUN mamba install -c conda-forge ncurses psutil && \
+    pip install -r /workspace/requirements.txt
 
-## Set the directory where you want to mount your s3 bucket
-ARG S3_MOUNT_DIRECTORY=/httr/bucket/mountpoint
-ENV S3_MOUNT_DIRECTORY=/httr/bucket/mountpoint
+# Set working directory
+WORKDIR /workspace
 
-## Replace with your s3 bucket name
-ARG S3_BUCKET_NAME=edap-ncct-external
-ENV S3_BUCKET_NAME=edap-ncct-external
+# Copy R installation scripts and lists
+COPY --chmod=755 package_loader.sh requirements.r package_fixer.sh docker_install_scripts/httrlib_builder_no_pdf.sh docker_install_scripts/install_r.sh /workspace/
+COPY Rpackages /workspace/Rpackages
+COPY httrlib /workspace/httrlib
 
-## change workdir to /
-WORKDIR /
-CMD ["bash", "/httr/scripts/start.sh"]
+RUN ./install_r.sh
+
+# copy httr directory and normalization pipeline script last in case code changes happen
+COPY --chmod=755 run_normalization_pipeline.sh /workspace/run_normalization_pipeline.sh
+COPY httr /workspace/httr
+
+WORKDIR /workspace

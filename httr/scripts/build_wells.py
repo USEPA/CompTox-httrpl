@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import sys
 
@@ -13,7 +14,7 @@ if __name__ == "__main__":
     args = sys.argv
 
     if len(args) == 1:
-        json_db_dir = "/workspace/docker_vol/db/"
+        json_db_dir = os.getenv("DB_DIR", "/workspace/docker_vol/db/")
     elif args[1] in ["-h", "--help"]:
         print("Python scipt used to build the httr_well collection.\nUsage:\n\tpython build_wells.py [JSON_DB_DIRECTORY]") 
         print("Default json DB directory is /workspace/docker_vol/db/")

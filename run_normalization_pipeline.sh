@@ -4,7 +4,11 @@
 set -e
 
 # Define the base directory for built collections
-COLLECTION_DIR="/workspace/docker_vol/db"
+if [[ -z "${DB_DIR}" ]]; then
+    COLLECTION_DIR="/workspace/docker_vol/db"
+else
+    COLLECTION_DIR="${DB_DIR}"
+fi
 
 # Define expected collection output paths
 QC_COLLECTION="${COLLECTION_DIR}/httr_counts_qc"
@@ -12,7 +16,7 @@ WELL_COLLECTION="${COLLECTION_DIR}/httr_well"
 TRT_GRP_COLLECTION="${COLLECTION_DIR}/httr_trt_grp_cmp"
 
 timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-LOGS_DIR="/workspace/docker_vol/logs/${timestamp}"
+LOGS_DIR="${COLLECTION_DIR}/logs/${timestamp}"
 mkdir -p "$LOGS_DIR"
 
 current_dir=$(pwd)
@@ -48,6 +52,8 @@ fi
 
 # Run DESeq2
 echo "Running DESeq2..."
+mkdir -p "${COLLECTION_DIR}/deseq2_results"
+
 Rscript run_deseq2.r 2>&1 | tee "${LOGS_DIR}/run_deseq2.log"
 
 cd $current_dir

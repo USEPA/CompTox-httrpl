@@ -2,7 +2,7 @@ library(httrlib)
 print("Loaded library!")
 STRICT <- FALSE
 DEBUG <- TRUE
-OUTPUT_DIR <- "/workspace/docker_vol/db"
+OUTPUT_DIR <- Sys.getenv("DB_DIR","/workspace/docker_vol/db")
 options(stringsAsFactors = F, warn = if (STRICT) {
   2
 } else {

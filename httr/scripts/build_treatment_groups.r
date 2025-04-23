@@ -2,28 +2,23 @@ library(httrlib)
 print("Loaded library!")
 STRICT <- FALSE
 DEBUG <- TRUE
-OUTPUT_DIR <- Sys.getenv("DB_DIR","/workspace/docker_vol/db")
+OUTPUT_DIR <- Sys.getenv("HTTRPL_DATA_DIR", "/var/lib/httrpl")
 options(stringsAsFactors = F, warn = if (STRICT) {
   2
 } else {
   1
 }, debug = DEBUG, output_dir = OUTPUT_DIR)
 
-ctrl_wells <- list(
-  "TC00000651_A05", "TC00000651_A12", "TC00000651_A22", "TC00000651_C08",
-  "TC00000651_C24", "TC00000651_E03", "TC00000651_E08", "TC00000651_E19",
-  "TC00000651_E21", "TC00000651_E22", "TC00000651_G07", "TC00000651_G12",
-  "TC00000651_I15", "TC00000651_K16", "TC00000651_K24", "TC00000651_M09",
-  "TC00000651_M11", "TC00000651_O05", "TC00000651_O07", "TC00000651_O10",
-  "TC00000651_O19", "TC00000651_O20", "TC00000652_B18", "TC00000652_B19",
-  "TC00000652_D05", "TC00000652_D12", "TC00000652_D19", "TC00000652_F09",
-  "TC00000652_F10", "TC00000652_F11", "TC00000652_F15", "TC00000652_F24",
-  "TC00000652_H08", "TC00000652_J08", "TC00000652_J10", "TC00000652_J11",
-  "TC00000652_L07", "TC00000652_L13", "TC00000652_L24", "TC00000652_N06",
-  "TC00000652_P10", "TC00000652_P16", "TC00000652_P19", "TC00000652_P21"
-)
+cat("Running build_treatment_groups.r in local database: ", OUTPUT_DIR, "\n")
 
 httr_well <- openMongo(output_dir = OUTPUT_DIR, collection = "httr_well")
+
+# get all control wells
+ctrl_wells <- httr_well$distinct(
+  "sample_id",
+  mongoQuery(stype = "vehicle control")
+)
+
 trt_names <- httr_well$distinct("trt_name")
 cat("Adding groups for ", length(trt_names), " treatment groups...\n")
 
@@ -37,7 +32,7 @@ for (trt in trt_names) {
     "sample_id",
     mongoQuery(stype = "test sample", trt_name = trt)
   )
-  
+
   get_trt_wells <- mongoQuery(sample_id = sample_IDs)
   trt_grp_id <- httr_well$distinct(key = "trt_name", query = get_trt_wells)
 

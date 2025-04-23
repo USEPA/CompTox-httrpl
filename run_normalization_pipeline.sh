@@ -4,11 +4,11 @@
 set -e
 
 # Define the base directory for built collections
-if [[ -z "${DB_DIR}" ]]; then
-    COLLECTION_DIR="/workspace/docker_vol/db"
-else
-    COLLECTION_DIR="${DB_DIR}"
+if [[ -z "${HTTRPL_DATA_DIR}" ]]; then
+    export HTTRPL_DATA_DIR="/var/lib/httrpl"
 fi
+
+COLLECTION_DIR="${HTTRPL_DATA_DIR}"
 
 # Define expected collection output paths
 QC_COLLECTION="${COLLECTION_DIR}/httr_counts_qc"

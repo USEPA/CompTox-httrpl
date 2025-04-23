@@ -2,7 +2,7 @@ print("Loaded library!")
 library(httrlib)
 STRICT <- FALSE
 DEBUG <- TRUE
-OUTPUT_DIR <- Sys.getenv("DB_DIR", "/workspace/docker_vol/db/")
+OUTPUT_DIR <- Sys.getenv("HTTRPL_DATA_DIR", "/var/lib/httrpl/")
 shrinkage <- "normal" # Set to "none" to remove DESeq2 shrinkage
 THREADS <- 4
 plate_effect <- TRUE # Set to FALSE to remove plate effect from DESeq2 model eq
@@ -11,6 +11,8 @@ options(stringsAsFactors = FALSE, warn = if (STRICT) {
 } else {
   1
 }, debug = DEBUG, output_dir = OUTPUT_DIR)
+
+cat("Running run_deseq2.r in local database ", OUTPUT_DIR, "\n")
 
 httr_trt_grp_cmp <- openMongo(
   output_dir = OUTPUT_DIR,

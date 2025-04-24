@@ -2,7 +2,7 @@ print("Loaded library!")
 library(httrlib)
 STRICT <- FALSE
 DEBUG <- TRUE
-OUTPUT_DIR <- "/workspace/docker_vol/db"
+OUTPUT_DIR <- Sys.getenv("HTTRPL_DATA_DIR", "/var/lib/httrpl/")
 shrinkage <- "normal" # Set to "none" to remove DESeq2 shrinkage
 THREADS <- 4
 plate_effect <- TRUE # Set to FALSE to remove plate effect from DESeq2 model eq
@@ -11,6 +11,8 @@ options(stringsAsFactors = FALSE, warn = if (STRICT) {
 } else {
   1
 }, debug = DEBUG, output_dir = OUTPUT_DIR)
+
+cat("Running run_deseq2.r in local database ", OUTPUT_DIR, "\n")
 
 httr_trt_grp_cmp <- openMongo(
   output_dir = OUTPUT_DIR,
@@ -31,9 +33,7 @@ for (trt_grp_name in trt_grp_names) {
   cat("\n--- Running DESeq2 on ", trt_grp_name, "---\n\n")
   res <- runDESeq2Single(trt_grp_id = trt_grp_name, output_dir = OUTPUT_DIR)
   # Define output filename with chem_id
-  output_filename <- paste0(
-    OUTPUT_DIR, "/deseq2_results/", trt_grp_name, ".csv"
-  )
+  output_filename <- file.path(OUTPUT_DIR, "deseq2_results", paste0(trt_grp_name,".csv"))
 
   # Save results to CSV
   write.csv(res, file = output_filename, row.names = FALSE)

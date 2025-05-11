@@ -47,11 +47,10 @@ class json_DB:
         creates the collection object if not found
         """
 
-        if items in self.collections:
-            return self.collections[items].data
-        else:
-            collection = json_DB_collection(self.output_dir, items)
-            return collection
+        if items not in self.collections:
+            self.collections[items] = json_DB_collection(self.output_dir, items)
+        
+        return self.collections[items]
             
     def __getattr__(self, items):
         """
@@ -66,11 +65,7 @@ class json_DB:
         the collection object corresponding to the provided name
         creates the collection object if not found
         """
-        if items in self.collections:
-            return self.collections[items].data
-        else:
-            collection = json_DB_collection(self.output_dir, items)
-            return collection
+        return self[items]
         
 class json_DB_collection:
     def __init__(self, output_dir, name):
@@ -123,6 +118,7 @@ class json_DB_collection:
         Nothing
         """
  
+        print(f"saving data to {self.filename}")
         with open(self.filename, "w") as f:
             for item in self.data:
                 for field in item:
@@ -218,8 +214,6 @@ class json_DB_collection:
         Return:
         The dict corresponding to the first row found
         """
-        
-        self.load_data()
         
         rows = self.find(query, filter)
         if len(rows)==0:

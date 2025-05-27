@@ -66,7 +66,8 @@ def getGoodCounts(probe_cnts: dict, good_probes: set) -> dict:
     (dict of int) = Filtered version of probe_cnts with only those keys in good_probes
     """
     keep_cnts = {probe_name: probe_cnts[probe_name]
-                 for probe_name in good_probes}
+                 for probe_name in good_probes
+                 if probe_name in probe_cnts}
     return keep_cnts
 
 # TO DO: There might be a way to do this with built-in mongo functions?

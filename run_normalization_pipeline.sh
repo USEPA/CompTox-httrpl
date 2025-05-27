@@ -3,6 +3,9 @@
 # Exit immediately on error
 set -e
 
+# Pipes should exit if there is an error, too
+set -o pipefail
+
 # Define the base directory for built collections
 if [[ -z "${HTTRPL_DATA_DIR}" ]]; then
     export HTTRPL_DATA_DIR="/var/lib/httrpl"
@@ -29,7 +32,6 @@ cd /workspace/httr/scripts/
 if [ ! -f "$QC_COLLECTION" ]; then
     echo "Collection 'httr_counts_qc' not found. Running QC Batch..."
     Rscript qc_batch.r 2>&1 | tee "${LOGS_DIR}/qc_batch.log"
-    Rscript qc_batch.r
 else
     echo "Collection 'httr_counts_qc' already exists. Skipping QC Batch."
 fi

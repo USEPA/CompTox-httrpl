@@ -70,3 +70,5 @@ COPY --chmod=755 run_normalization_pipeline.sh /workspace/run_normalization_pipe
 COPY httr /workspace/httr
 
 WORKDIR /workspace
+
+ENV PYTHONUNBUFFERED=TRUE

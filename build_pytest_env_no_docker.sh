@@ -2,7 +2,7 @@
 
 if [ ! -e venv_httr_app ]
 then
-  python3.6 -m venv venv_httr_app
+  python3 -m venv venv_httr_app
   . venv_httr_app/bin/activate
   pip install --upgrade pip
   pip install docker-compose==1.28.5

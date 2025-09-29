@@ -4,13 +4,22 @@
 #'
 #' @param DB (\emph{mongo object}) = Open DB connection to httr_trt_grp_cmp collection
 #' @param query (\emph{json}) = Query for returning docs from httr_trt_grp_cmp collection
+#' @param db_host (\emph{character}) = If DB is NULL, this specifies the host to open a connection to
+#' @param db_name (\emph{character}) = If DB is NULL, this specifies the DB name to connect to
+#' @param collection (\emph{character}) = If DB is NULL, this specifies the collection to connect to, default: httr_trt_grp_cmp
+#
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
+#' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @export getTrts
 #' @return (\emph{list of lists}) = Names come from trt_grp_id field, each member is a complete httr_trt_grp_cmp doc (list)
 
-getTrts <- function(DB, query, debug=getOption("debug",default=FALSE)) {
+getTrts <- function(DB, query, 
+                    db_host=NULL, db_name=NULL, collection="httr_trt_grp_cmp",
+                    debug=getOption("debug",default=FALSE), output_dir="") {
+                    
   if(debug) {cat("Querying treatments groups for:", query, "\n")}
   # Run the query with iterate and then process each returned value
+  DB <- getDB(DB,db_host,db_name,collection, output_dir = output_dir)
   trt_iter <- iterate(DB,query = query)
   trt_list <- list()
   while(!is.null(trt_data <- trt_iter$one())) {

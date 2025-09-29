@@ -3,8 +3,8 @@
 #' Given a list of treatment and control samples, construct an appropriate document and insert into httr_trt_grp_cmp
 #'     
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections
+#' @param db_host (string) = name of host name where db name is located, defaults to NULL, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections, defaults to NULL, can be set with options(DB_NAME=...)
 #' @param  trt_wells (vector) = Sample IDs of all treated wells in the comparison group
 #' @param  ctrl_wells (vector) = Sample IDs of all control wells in the the comparison group
 #' @param  trt_prop_fields (vector) = Fields in httr_well collection that should match up for all trt_wells and the singular value should be propagated to field of same name in httr_trt_grp_cmp collection. Default is to propagate chem_id, conc, conc_unit, dose_level, and stype fields.
@@ -21,8 +21,8 @@
 #' @return      (list) = Document that was inserted into trt_grp collection
 #' @export treatGroupFromSamples
   
-treatGroupFromSamples <- function(db_host = getOption("DB_HOST"),
-                                  db_name = getOption("DB_NAME"),
+treatGroupFromSamples <- function(db_host = getOption("DB_HOST",NULL),
+                                  db_name = getOption("DB_NAME",NULL),
                                   trt_wells, 
                                   ctrl_wells, 
                                   trt_prop_fields = c("chem_id", "conc", "conc_unit", "dose_level", "stype"),
@@ -193,8 +193,8 @@ treatGroupFromSamples <- function(db_host = getOption("DB_HOST"),
 #' Given a specific chemical and dose, plus optional filter criteria, construct an appropriate document and insert into httr_trt_grp_cmp. Note, if filtering reduces either trt or ctrl group to < min_reps samples this treatment group will be skipped.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections
+#' @param db_host (string) = name of host name where db name is located, defaults to NULL, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections, defaults to NULL, can be set with options(DB_NAME=...)
 #' @param  trt_chem (str) = Match to chem_id in httr_well 
 #' @param  trt_dose (int) = Match to dose_level in httr_well (set to None to exclude)
 #' @param  trt_type (str) = Match to stype in httr_well, defaults to "test sample"
@@ -217,8 +217,8 @@ treatGroupFromSamples <- function(db_host = getOption("DB_HOST"),
 #' @export chemTreatGroup
   
 
-chemTreatGroup <- function(db_host = getOption("DB_HOST"),
-                           db_name = getOption("DB_NAME"),
+chemTreatGroup <- function(db_host = getOption("DB_HOST",NULL),
+                           db_name = getOption("DB_NAME",NULL),
                            trt_chem, 
                            trt_dose, 
                            trt_type = "test sample", 
@@ -313,8 +313,8 @@ chemTreatGroup <- function(db_host = getOption("DB_HOST"),
 #' Loop over all plate groups, media, timeh, chem_id, and dose_level and create a httr_trt_grp_cmp document for each one.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections, can be set with options(DB_NAME=...)
 #' @param well (str) = Name of collection with individual well treatment data, default is "httr_well"
 #' @param exp_doses (int) = Expected number of doses for each test chemical - this will suppress some debug messages and only warn if the number of doses does not match
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
@@ -325,8 +325,8 @@ chemTreatGroup <- function(db_host = getOption("DB_HOST"),
 #' @export allTestGroups
   
 # TO DO: Parameters to limit to a subset of plate groups, etc.
-allTestGroups <- function (db_host = getOption("DB_HOST"),
-                           db_name = getOption("DB_NAME"), 
+allTestGroups <- function (db_host = getOption("DB_HOST",NULL),
+                           db_name = getOption("DB_NAME",NULL), 
                            well = "httr_well",
                            exp_doses,
                            output_dir = "",
@@ -476,8 +476,8 @@ allTestGroups <- function (db_host = getOption("DB_HOST"),
 #' Given a specific reference chemical and plate group (or media/timeh that specify plate group), plus any optional filter criteria, construct an appropriate document and insert into httr_trt_grp_cmp. This function is just a convenenience wrapper to chemTreatGroup with modified defaults.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections, can be set with options(DB_NAME=...)
 #' @param  trt_chem (str) = Match to chem_id in httr_well 
 #' @param  pg_id (str) = Filter both trt and ctrl wells, match to pg_id in httr_well, defaults to None
 #' @param  media (str) = Filter both trt and ctrl wells, match to media in httr_well, defaults to None
@@ -494,8 +494,8 @@ allTestGroups <- function (db_host = getOption("DB_HOST"),
 #' @export refChemGroup
 
 
-refChemGroup <- function(db_host = getOption("DB_HOST"),
-                         db_name = getOption("DB_NAME"), 
+refChemGroup <- function(db_host = getOption("DB_HOST",NULL),
+                         db_name = getOption("DB_NAME",NULL), 
                          trt_chem, 
                          pg_id = NULL,
                          media = NULL, 
@@ -525,8 +525,8 @@ refChemGroup <- function(db_host = getOption("DB_HOST"),
 #' Loop over all plate groups, media, timeh, chem_id (reference chemicals only) and create a httr_trt_grp_cmp document for each one.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections, can be set with options(DB_NAME=...)
 #' @param trt_type (str) = Filter stype to get list of plate groups, media, timeh, and chem_id
 #' @param well (str) = Name of collection with individual well treatment data, default is "httr_well"
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
@@ -537,8 +537,8 @@ refChemGroup <- function(db_host = getOption("DB_HOST"),
 #' @export allRefGroups
   
   
-allRefGroups <- function(db_host = getOption("DB_HOST"),
-                         db_name = getOption("DB_NAME"),
+allRefGroups <- function(db_host = getOption("DB_HOST",NULL),
+                         db_name = getOption("DB_NAME",NULL),
                          trt_type = "reference chemical",
                          well = "httr_well",
                          output_dir = "",
@@ -599,8 +599,8 @@ allRefGroups <- function(db_host = getOption("DB_HOST"),
 #' Given a specific plate group, plus any optional filter criteria, construct an appropriate document and insert into httr_trt_grp_cmp. This function is just a convenenience wrapper to chemTreatGroup with modified defaults.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections, can be set with options(DB_NAME=...)
 #' @param pg_id (str) = Filter both trt and ctrl wells, match to pg_id in httr_well, required for bulk lysate groups
 #' @param trt_chem (str) = Match to chem_id in httr_well, defaults to "TSA"
 #' @param trt_dose (int) = Match to dose_level in httr_well - Excluded by default
@@ -621,8 +621,8 @@ allRefGroups <- function(db_host = getOption("DB_HOST"),
 #' Pass to chemTreatGroup:
 #' @export bulkLysateGroup
   
-bulkLysateGroup <- function(db_host = getOption("DB_HOST"),
-                            db_name = getOption("DB_NAME"), 
+bulkLysateGroup <- function(db_host = getOption("DB_HOST",NULL),
+                            db_name = getOption("DB_NAME",NULL), 
                             pg_id,
                             trt_chem = "TSA", 
                             trt_dose = NULL,
@@ -649,8 +649,8 @@ bulkLysateGroup <- function(db_host = getOption("DB_HOST"),
 #' Loop over all plate groups, chem_id (bulk lysate chemicals only) and create a httr_trt_grp_cmp document for each one.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections, can be set with options(DB_NAME=...)
 #' @param trt_type (str) = Filter stype to get list of plate groups, chem_id
 #' @param rna_src (str) = Filter rna_src to get list of plate groups, chem_id
 #' @param ctrl_chem (str) = Skip this chemical when looping over chem_id
@@ -662,8 +662,8 @@ bulkLysateGroup <- function(db_host = getOption("DB_HOST"),
 #' @export allBulkLysateGroups
   
   
-allBulkLysateGroups <- function(db_host = getOption("DB_HOST"),
-                                db_name = getOption("DB_NAME"),
+allBulkLysateGroups <- function(db_host = getOption("DB_HOST",NULL),
+                                db_name = getOption("DB_NAME",NULL),
                                 trt_type = "QC sample",
                                 rna_src = "Bulk Lysate",
                                 ctrl_chem = "DMSO",
@@ -716,8 +716,8 @@ allBulkLysateGroups <- function(db_host = getOption("DB_HOST"),
 #' Given a specific plate group, plus any optional filter criteria, construct an appropriate document and insert into httr_trt_grp_cmp. This function is just a convenenience wrapper to chemTreatGroup with modified defaults.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections, can be set with options(DB_NAME=...)
 #' @param pg_id (str) = Filter both trt and ctrl wells, match to pg_id in httr_well, required for ref RNA groups
 #' @param trt_type (str) = Match to stype in httr_well, defaults to "QC sample"
 #' @param ctrl_type (str) = Match to stype in httr_well, defaults to "QC sample"
@@ -736,8 +736,8 @@ allBulkLysateGroups <- function(db_host = getOption("DB_HOST"),
 #' Pass to chemTreatGroup:
 #' @export refRNAGroup
    
-refRNAGroup <- function(db_host = getOption("DB_HOST"),
-                        db_name = getOption("DB_NAME"), 
+refRNAGroup <- function(db_host = getOption("DB_HOST",NULL),
+                        db_name = getOption("DB_NAME",NULL), 
                         pg_id,
                         trt_type = "QC sample",
                         ctrl_type = "QC sample", 
@@ -762,8 +762,8 @@ refRNAGroup <- function(db_host = getOption("DB_HOST"),
 #' Loop over all plate groups and create a httr_trt_grp_cmp document for each pair of reference RNAs.
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = name of database with httr_well and httr_trt_grp_cmp collections collections collections, can be set with options(DB_NAME=...)
 #' @param well (str) = Name of collection with individual well treatment data, default is "httr_well"
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @param ... = All additional args passed to refRNAGroup
@@ -772,8 +772,8 @@ refRNAGroup <- function(db_host = getOption("DB_HOST"),
 #' Store all documents in a list, also track the number that were skipped due to insufficient replicates with passing QC flags:
 #' @export allRefRNAGroups
   
-allRefRNAGroups <- function(db_host = getOption("DB_HOST"),
-                            db_name = getOption("DB_NAME"),
+allRefRNAGroups <- function(db_host = getOption("DB_HOST",NULL),
+                            db_name = getOption("DB_NAME",NULL),
                             well = "httr_well",
                             output_dir = "",
                             ...){
@@ -814,8 +814,8 @@ allRefRNAGroups <- function(db_host = getOption("DB_HOST"),
 #' Also, unlike allRefGroups, this will automatically append plate group ID as part of the trt_name when creating docs
 #' 
 #' Parameters:
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (pymongo.MongoClient) = Open connection to database with httr_well and httr_trt_grp_cmp collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (pymongo.MongoClient) = Open connection to database with httr_well and httr_trt_grp_cmp collections, can be set with options(DB_NAME=...)
 #' @param  trt_type (str) = Filter stype to get list of plate groups, media, timeh, and chem_id
 #' @param  trt_prop_fields (list of str) = Fields in httr_well collection that should match up for all trt_wells and the singular value should be propagated to field of same name in httr_trt_grp_cmp collection. Default is to propagate chem_id, conc, conc_unit, dose_level, and stype fields
 #' @param  grp_id_opts (list) = Options to modify trt_grp_id generation, "pg" is usually sufficient for reference chemicals to create distinct group IDs for each plate group
@@ -828,8 +828,8 @@ allRefRNAGroups <- function(db_host = getOption("DB_HOST"),
 #' @export allRefDoseGroups
 
 
-allRefDoseGroups <- function(db_host = getOption("DB_HOST"),
-                             db_name = getOption("DB_NAME"),
+allRefDoseGroups <- function(db_host = getOption("DB_HOST",NULL),
+                             db_name = getOption("DB_NAME",NULL),
                              trt_type ="reference chemical",
                              trt_prop_fields = c("chem_id", "conc", "conc_unit", "dose_level", "stype"),
                              grp_id_opts=c("pg"),
@@ -909,8 +909,8 @@ allRefDoseGroups <- function(db_host = getOption("DB_HOST"),
 #'   Construct a document for httr_trt_grp_cmp collection corresponding to a specific pair of treatment names.
 #'    
 #'    Given a specific pair of trt_name values, plus optional filter criteria, construct an appropriate document and insert into httr_trt_grp_cmp. This is initially designed for the pairs of BioSpyder QC reference samples now used in newer screens, but should work for other situations as well. Note, if filtering reduces either trt or ctrl group to < min_reps samples this treatment group will be skipped.
-#' @param     db_host (string) = name of host name where db name is located
-#' @param     db_name (string) name of database with httr_well and httr_trt_grp_cmp collections
+#' @param     db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param     db_name (string) name of database with httr_well and httr_trt_grp_cmp collections, can be set with options(DB_NAME=...)
 #' @param     trt_name (string) = Match to trt_name in httr_well
 #' @param     ctrl_name (string) = Match to trt_name in httr_well, use as control group
 #' @param     trt_type (string) = Match to stype in httr_well, defaults to "QC sample"
@@ -922,15 +922,15 @@ allRefDoseGroups <- function(db_host = getOption("DB_HOST"),
 #' @param     ctrl_src (string) = Filter ctrl wells, match to rna_src field
 #' @param     qc_flags (vector) = Filter both trt and ctrl wells, match to qc_flag field, defaults to OK only
 #' @param     min_reps (int) = Minimum number of replicates in trt and ctrl groups, respectively - if either is less, will generate an output message and return empty dict
-#' @param     well (string) = Name of collection with individual well treatment data, default is "httr_well"
+#' @param     well (string) = Name of collection with individual well treatment data, default is "httr_well", can be set with options(HTTR_WELL_NAME=...)
 #' @param     check_collection_present (bool) to check that httr_well is present, exit if not - defaults to FALSE cause check likely happened upstream already
 #' @param     output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @param     ... = All additional args passed to treatGroupFromSamples
 #' @return   (list) = Document that was inserted into trt_grp collection
 #' @export  treatPairGroup
 
-treatPairGroup <- function(db_host = getOption("DB_HOST"),
-                           db_name = getOption("DB_NAME"),
+treatPairGroup <- function(db_host = getOption("DB_HOST",NULL),
+                           db_name = getOption("DB_NAME",NULL),
                            trt_name,
                            ctrl_name,
                            trt_type = "QC sample", 
@@ -942,7 +942,7 @@ treatPairGroup <- function(db_host = getOption("DB_HOST"),
                            ctrl_src = "", 
                            qc_flags = c("OK"), 
                            min_reps = 2,
-                           well =  getOption("HTTR_WELL_NAME"),  
+                           well =  getOption("HTTR_WELL_NAME",NULL),  
                            check_collection_present = FALSE,
                            output_dir = "",
                            ...){
@@ -1009,8 +1009,8 @@ treatPairGroup <- function(db_host = getOption("DB_HOST"),
 #' Construct a document for httr_trt_grp_cmp collection corresponding to the BioSpyder purified reference RNA QC sample comparison (A vsB).
 #'   
 #' Given a specific plate group, plus any optional filter criteria, construct an appropriate document and insert into httr_trt_grp_cmp. This function is just a convenenience wrapper to chemTreatGroup with modified defaults.
-#' @param db_host (string) = name of host name where db name is located
-#' @param db_name (db name) = Open connection to database with httr_well and httr_trt_grp_cmp collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (db name) = Open connection to database with httr_well and httr_trt_grp_cmp collections, can be set with options(DB_NAME=...)
 #' @param pg_id (string) = Filter both trt and ctrl wells, match to pg_id in httr_well, required for ref RNA groups
 #' @param trt_name (string) = Match to trt_name in httr_well
 #' @param ctrl_name (string) = Match to trt_name in httr_well, use as control group
@@ -1028,8 +1028,8 @@ treatPairGroup <- function(db_host = getOption("DB_HOST"),
 #' @return (list) = Document that was inserted into trt_grp collection
 #' @export bspRNAGroup
 
-bspRNAGroup <- function(db_host = getOption("DB_HOST"),
-                        db_name = getOption("DB_NAME"), 
+bspRNAGroup <- function(db_host = getOption("DB_HOST",NULL),
+                        db_name = getOption("DB_NAME",NULL), 
                         pg_id,
                         trt_name = "BSP_RNA_B",
                         ctrl_name = "BSP_RNA_A",
@@ -1054,17 +1054,17 @@ bspRNAGroup <- function(db_host = getOption("DB_HOST"),
 #' allBspRNAGroups
 #' Construct documents for httr_trt_grp_cmp collection corresponding to each BioSpyder Reference RNA QC sample comparison (single conc treatment).
 #'    Loop over all plate groups and create a httr_trt_grp_cmp document for each pair of reference RNAs.
-#' @param db_host (string) = name of host name where db name is located    
-#' @param db_name (string) = database name with httr_well and httr_trt_grp_cmp collections
-#' @param well (string) = Name of collection with individual well treatment data, default is "httr_well"
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...) 
+#' @param db_name (string) = database name with httr_well and httr_trt_grp_cmp collections, can be set with options(DB_NAME=...)
+#' @param well (string) = Name of collection with individual well treatment data, default is "httr_well", can be set with options(HTTR_WELL_NAME=...)
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @param ... = All additional args passed to bspRNAGroup
 #' @return (list) = List of documents that were inserted into trt_grp collection
 #' @export allBspRNAGroups
 
-allBspRNAGroups <- function(db_host = getOption("DB_HOST"),
-                            db_name = getOption("DB_NAME"),
-                            well = getOption("HTTR_WELL_NAME"),
+allBspRNAGroups <- function(db_host = getOption("DB_HOST",NULL),
+                            db_name = getOption("DB_NAME",NULL),
+                            well = getOption("HTTR_WELL_NAME",NULL),
                             output_dir = "",
                             ...){
     
@@ -1100,8 +1100,8 @@ allBspRNAGroups <- function(db_host = getOption("DB_HOST"),
 #' bspLysateGroup
 #' Construct a document for httr_trt_grp_cmp collection corresponding to the BioSpyder reference QC lysate sample comparison (A vsB).
 #' Given a specific plate group, plus any optional filter criteria, construct an appropriate document and insert into httr_trt_grp_cmp. This function is just a convenenience wrapper to chemTreatGroup with modified defaults. Note that unlike the original MCF7 bulk lysates, these samples are annotated more like the reference RNA samples.
-#' @param db_host (string) = name of host name where db name is located   
-#' @param db_name (string) database name with httr_well and httr_trt_grp_cmp collections
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) database name with httr_well and httr_trt_grp_cmp collections, can be set with options(DB_NAME=...)
 #' @param pg_id (string) = Filter both trt and ctrl wells, match to pg_id in httr_well, required for ref RNA groups
 #' @param trt_name (string) = Match to trt_name in httr_well
 #' @param ctrl_name (string) = Match to trt_name in httr_well, use as control group
@@ -1119,8 +1119,8 @@ allBspRNAGroups <- function(db_host = getOption("DB_HOST"),
 #' @return  (list) = Document that was inserted into trt_grp collection
 #' @export bspLysateGroup   
     
-bspLysateGroup <- function(db_host = getOption("DB_HOST"),
-                           db_name = getOption("DB_NAME"), 
+bspLysateGroup <- function(db_host = getOption("DB_HOST",NULL),
+                           db_name = getOption("DB_NAME",NULL), 
                            pg_id,
                            trt_name = "BSP_LYSATE_B",
                            ctrl_name = "BSP_LYSATE_A",
@@ -1146,17 +1146,17 @@ bspLysateGroup <- function(db_host = getOption("DB_HOST"),
 #' allBspLysateGroups
 #' Construct documents for httr_trt_grp_cmp collection corresponding to each BioSpyder Reference QC Lysate sample comparison (single conc treatment).
 #'    Loop over all plate groups and create a httr_trt_grp_cmp document for each pair of reference RNAs.
-#' @param db_host (string) = name of host name where db name is located    
-#' @param db_name (string) = database name with httr_well and httr_trt_grp_cmp collections
-#' @param well (string) = Name of collection with individual well treatment data, default is "httr_well"
+#' @param db_host (string) = name of host name where db name is located, can be set with options(DB_HOST=...)
+#' @param db_name (string) = database name with httr_well and httr_trt_grp_cmp collections, can be set with options(DB_NAME=...)
+#' @param well (string) = Name of collection with individual well treatment data, default is "httr_well", can be set with options(HTTR_WELL_NAME=...)
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' @param ... = All additional args passed to bspLysateGroup
 #' @return (list) = List of documents that were inserted into trt_grp collection
 #' @export allBspLysateGroups
     
-allBspLysateGroups <- function(db_host = getOption("DB_HOST"),
-                               db_name = getOption("DB_NAME"),
-                               well = getOption("HTTR_WELL_NAME"),
+allBspLysateGroups <- function(db_host = getOption("DB_HOST",NULL),
+                               db_name = getOption("DB_NAME",NULL),
+                               well = getOption("HTTR_WELL_NAME",NULL),
                                output_dir = "",
                                ...){
     

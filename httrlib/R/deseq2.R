@@ -2,7 +2,7 @@
 #' Removes any sample with colsum < min_colsum
 
 #' @param COUNTS (\emph{data.frame}) = Data frame containing all counts to be analyzed, row.names = probes, colnames = samples
-#' @param min_colsum (\emph{integer}) = Remove any samples with colsum below this value
+#' @param min_colsum (\emph{integer}) = Remove any samples with colsum below this value, can be set using options(min_colsum=...)
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
 #' @export filterSamplesByTotal
 #' @return (\emph{data.frame}) = COUNTS after removing the samples with low colsum
@@ -11,7 +11,7 @@
 # TO DO: Set a default cutoff here, make it a global option
 # TO DO: Add an optional CONDS param - if specified, apply filter there as well and return both as list
 
-filterSamplesByTotal <- function(COUNTS, min_colsum=getOption("min_colsum"), debug=getOption("debug",default=FALSE)) {
+filterSamplesByTotal <- function(COUNTS, min_colsum=getOption("min_colsum",default=100000), debug=getOption("debug",default=FALSE)) {
   # Compute colsums:
   my_colsums <- colSums(COUNTS)
   if(debug) { 
@@ -28,14 +28,14 @@ filterSamplesByTotal <- function(COUNTS, min_colsum=getOption("min_colsum"), deb
 #' Removes any probes with mean count < mean_cnt
 #'
 #' @param COUNTS (\emph{data.frame}) = Data frame containing all counts to be analyzed, row.names = probes, colnames = samples
-#' @param mean_cnt (\emph{integer}) = Remove any samples with colsum below this value
+#' @param mean_cnt (\emph{integer}) = Remove any samples with colsum below this value, can be set using options(mean_cnt=...)
 #' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
 #'
 #' @return (\emph{data.frame}) = COUNTS after removing the probes with low mean counts
 #' @export filterProbesByMean
 
 # TO DO: Set a default cutoff here, make it a global option
-filterProbesByMean <- function(COUNTS, mean_cnt=getOption("mean_cnt"), debug=getOption("debug",default=FALSE)) {
+filterProbesByMean <- function(COUNTS, mean_cnt=getOption("mean_cnt",default=5), debug=getOption("debug",default=FALSE)) {
   row_means <- apply(COUNTS, 1, mean)
   if(debug) {
     if(any(row_means < mean_cnt)) {
@@ -77,7 +77,7 @@ filterProbesByMean <- function(COUNTS, mean_cnt=getOption("mean_cnt"), debug=get
 
 
 runDESeq2 <- function(COUNTS, CONDS, ref_level="DMSO_0",
-                      plate_effect=F, plate_cont=F, shrinkage="normal",
+                      plate_effect=T, plate_cont=F, shrinkage="normal",
                       threads=1, debug=getOption("debug",default=FALSE)
 ){
 
@@ -218,10 +218,9 @@ runDESeq2 <- function(COUNTS, CONDS, ref_level="DMSO_0",
 #' @return collections (\emph{named character vector}) = vector to re-map collection names used, where name=default collection; value=new collection name
 
 check_collection_remapped <- function(collections){
-
-
-
-  def_collections <- c("httr_well", "httr_trt_grp_cmp", "httr_deg")
+  
+  def_collections <- c("httr_well_trt", "httr_chem", "httr_raw", "httr_probe", "httr_counts", "httr_counts_qc", "httr_well", "httr_deg", "httr_trt_grp_cmp")
+  
   def_collections <- setdiff(def_collections, names(collections))
   names(def_collections) <- def_collections
   collections <- c(collections, def_collections)
@@ -240,8 +239,8 @@ check_collection_remapped <- function(collections){
 #' @param media (\emph{character}) = Limit httr_trt_grp_cmp to this media type, useful if multiple dose response series for same chem_id
 #' @param timeh (\emph{integer}) = Limit httr_trt_grp_cmp to this timeh, useful if multiple dose response series for same chem_id
 #' @param max_dose_level (\emph{integer}) = Max number of dose levels expected
-#' @param min_colsum (\emph{integer}) = Filter samples by min read total, set to NULL to skip, defaults to 100k
-#' @param mean_cnt (\emph{integer}) = Filter probes by mean floor, set to NULL to skip, defaults to 5
+#' @param min_colsum (\emph{integer}) = Filter samples by min read total, set to NULL to skip, defaults to 100k, can be altered using options(min_colsum=...)
+#' @param mean_cnt (\emph{integer}) = Filter probes by mean floor, set to NULL to skip, defaults to 5, can be altered using options(mean_cnt=...)
 #' @param plate_effect (\emph{logical}) = Whether or not to include plate effect in model, defaults to FALSE
 #' @param shrinkage (\emph{character}) = Type of shrinkage to use, defaults to new default, a.k.a. "normal"
 #' @param threads (\emph{integer}) = Number of threads to use for core DESeq2 functions, defaults to 1 (no multi-threading)
@@ -254,15 +253,16 @@ check_collection_remapped <- function(collections){
 
 extract_and_run <- function(chem_id, db_host, db_name, 
                                  pg_id=NULL, media=NULL, timeh=NULL, max_dose_level=8,
-                                 min_colsum=getOption("min_colsum"), mean_cnt=getOption("mean_cnt"),
-                                 plate_effect=F, shrinkage="normal", threads=1,
+                                 min_colsum=getOption("min_colsum",default=100000), mean_cnt=getOption("mean_cnt",default=5),
+                                 plate_effect=getOption("plate_effect", default=T), shrinkage="normal", threads=1,
                                  collections=character(0),
                                  debug=getOption("debug",default=FALSE),
                                  output_dir = ""){
 
 
 
-
+  collections <- check_collection_remapped(collections)
+  
   # Extract httr_trt_grp_cmp for chem_id, pg_id, media, timeh - check max_dose_level
   chemTrts <- getChemTrts(chem_id=chem_id, db_host=db_host, db_name=db_name, collection=collections["httr_trt_grp_cmp"], pg_id=pg_id, media=media, timeh=timeh, max_dose_level=max_dose_level, debug=debug, output_dir=output_dir)
   if(!sameCtrlWells(chemTrts, debug=debug)) {
@@ -337,11 +337,13 @@ extract_and_run <- function(chem_id, db_host, db_name,
 #' @return (\emph{data.frame}) = Contains DESeq2 results for all treatments in the dose-response series
 
 
-format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect, shrinkage, collections, db_host, db_name, note, rerun, debug, db_insert, output_dir = ""){
+format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect, shrinkage, collections=character(0), db_host, db_name, note, rerun, debug, db_insert, output_dir = ""){
 
   my_results <- extract_and_run_return[[1]]
   chemTrts <- extract_and_run_return[[2]]
   trt_grp_name <- extract_and_run_return[[3]]
+  
+  collections <- check_collection_remapped(collections)
   
   
   if(db_insert) {
@@ -416,8 +418,8 @@ format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect,
 #' @param media (\emph{character}) = Limit httr_trt_grp_cmp to this media type, useful if multiple dose response series for same chem_id
 #' @param timeh (\emph{integer}) = Limit httr_trt_grp_cmp to this timeh, useful if multiple dose response series for same chem_id
 #' @param max_dose_level (\emph{integer}) = Max number of dose levels expected
-#' @param min_colsum (\emph{integer}) = Filter samples by min read total, set to NULL to skip, defaults to 100k
-#' @param mean_cnt (\emph{integer}) = Filter probes by mean floor, set to NULL to skip, defaults to 5
+#' @param min_colsum (\emph{integer}) = Filter samples by min read total, set to NULL to skip, defaults to 100k, can be altered using options
+#' @param mean_cnt (\emph{integer}) = Filter probes by mean floor, set to NULL to skip, defaults to 5, can be altered using options(mean_cnt=...)
 #' @param plate_effect (\emph{logical}) = Whether or not to include plate effect in model, defaults to FALSE
 #' @param shrinkage (\emph{character}) = Type of shrinkage to use, defaults to new default, a.k.a. "normal"
 #' @param threads (\emph{integer}) = Number of threads to use for core DESeq2 functions, defaults to 1 (no multi-threading)
@@ -434,8 +436,8 @@ format_for_db_insert <- function(extract_and_run_return, mean_cnt, plate_effect,
 
 runDESeq2ForChemCond <- function(chem_id, db_host, db_name, 
                                  pg_id=NULL, media=NULL, timeh=NULL, max_dose_level=8,
-                                 min_colsum=10^5, mean_cnt=getOption("mean_cnt"),
-                                 plate_effect=F, shrinkage="normal", threads=1,
+                                 min_colsum=getOption("min_colsum",10^5), mean_cnt=getOption("mean_cnt",default=5),
+                                 plate_effect=getOption("plate_effect",T), shrinkage="normal", threads=1,
                                  collections=character(0), db_insert=T, rerun=F, note=NULL,
                                  debug=getOption("debug",default=FALSE),output_dir="") {
   
@@ -462,7 +464,7 @@ runDESeq2ForChemCond <- function(chem_id, db_host, db_name,
 #' @param db_host (\emph{character}) = Host for DB connection
 #' @param db_name (\emph{character}) = Name of DB
 #' @param min_colsum (\emph{integer}) = Filter samples by min read total, set to NULL to skip, defaults to 100k
-#' @param mean_cnt (\emph{integer}) = Filter probes by mean floor, set to NULL to skip, defaults to 5
+#' @param mean_cnt (\emph{integer}) = Filter probes by mean floor, set to NULL to skip, defaults to 5, overridden by options(mean_cnt=...)
 #' @param plate_effect (\emph{logical}) = Whether or not to include plate effect in model, defaults to FALSE
 #' @param shrinkage (\emph{character}) = Type of shrinkage to use, defaults to new default, a.k.a. "normal"
 #' @param threads (\emph{integer}) = Number of threads to use for core DESeq2 functions, defaults to 1 (no multi-threading)
@@ -477,18 +479,16 @@ runDESeq2ForChemCond <- function(chem_id, db_host, db_name,
 #' @return  (\emph{data.frame}) = Contains DESeq2 results for all treatments in the dose-response series
 
 runDESeq2Single <- function(trt_grp_id, db_host, db_name, 
-                            min_colsum=10^5, mean_cnt=getOption("mean_cnt"),
-                            plate_effect=F, shrinkage="normal", threads=1,
+                            min_colsum=getOption("min_colsum",default=10^5), mean_cnt=getOption("mean_cnt",default=5),
+                            plate_effect=getOption("plate_effect", default=T), shrinkage="normal", threads=1,
                             collections=character(0), db_insert=T, rerun=F, note=NULL,
                             debug=getOption("debug",default=FALSE), 
                             output_dir = "", ...
 ) {
   # Check if any collections are re-mapped, fill in defaults for everything else
   # TO DO: This could be useful to put in a separate function for all functions that need to access multiple collections
-  def_collections <- c("httr_well", "httr_trt_grp_cmp", "httr_deg")
-  def_collections <- setdiff(def_collections, names(collections))
-  names(def_collections) <- def_collections
-  collections <- c(collections, def_collections)
+  
+  collections <- check_collection_remapped(collections)
   
   # Extract httr_trt_grp_cmp for trt_grp_id - should get exactly one hit
   httr_trt_grp_cmp <- openMongo(db_host = db_host, db_name = db_name, collection = collections['httr_trt_grp_cmp'], check_collection_present=TRUE, output_dir = output_dir)

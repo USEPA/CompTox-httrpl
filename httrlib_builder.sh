@@ -9,9 +9,13 @@ Rscript doxygen.r
 cd ..
 Rscript rd2cmd
 #building httr pdf documentation
-R CMD Rd2pdf httrlib &
-sleep 5
-mv httrlib.pdf httrlib/
+if ! R CMD Rd2pdf httrlib; then
+    echo "Warning: PDF couldn't be built"
+    sleep 5
+else
+    sleep 5
+    mv httrlib.pdf httrlib/
+fi
 
 #building httrlib
 R CMD build httrlib

@@ -9,7 +9,7 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 exports:
     DESeq2_cut
     addQCplotCols
@@ -34,6 +34,7 @@ exports:
     getDocIDs
     getFCmatrix
     getProbeManifest
+    getPass
     getQCdefault
     getTrts
     getWellCounts
@@ -62,6 +63,7 @@ exports:
     updateqcFlags
     validateProbeManifest
     validate_httr_well_trt_schema
+    validateProbeManifest_test
 Suggests: 
     BiocParallel,
     DESeq2,
@@ -69,10 +71,12 @@ Suggests:
     reldist,
     rlist,
     stats,
-    testthat
 Imports:
     data.table,
     jsonlite,
     mongolite,
     foreach,
-    stringr
+    stringr,
+    dplyr,
+    purrr,
+    testthat

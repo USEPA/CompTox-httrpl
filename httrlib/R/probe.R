@@ -58,17 +58,23 @@ validateProbeManifest <- function(file_or_data, DB=NULL, db_host=NULL, db_name=N
   }
   
   #fetching httr_probe data
-  DB <- getDB(DB,db_host,db_name,collection, output_dir = output_dir)
-  data <- Find(DB)
-  probe_data_table <- as.data.table(data)
-  
+  if (is.null(DB) && is.null(db_host) && is.null(db_name) && output_dir == ""){
+    probeData_and_mongo_data <- list(probe_data)
+    probeData_and_mongo_data_names <- c("probe_data passed")
+  }
+  else{
+
+    DB <- getDB(DB,db_host,db_name,collection, output_dir = output_dir)
+    data <- Find(DB)
+    probe_data_table <- as.data.table(data)
+    probeData_and_mongo_data <- list(probe_data_table, probe_data)
+    probeData_and_mongo_data_names <- c("httr_probe data", "probe_data passed")
+  }
 
   dbCols <- c("index", "probe_name", "probe_idnum", "probe_seq", "transcripts", "entrez_id", "gene_symbol", "ensembl_gene", "ref_transcript", "probe_flag", "attenuation")
   
   required_cols <- c("index", "probe_name", "probe_idnum", "probe_seq", "transcripts", "entrez_id", "gene_symbol", "probe_flag")
   
-  probeData_and_mongo_data <- list(probe_data_table, probe_data)
-  probeData_and_mongo_data_names <- c("httr_probe data", "probe_data passed")
   for (i in  seq_along(probeData_and_mongo_data)){
   
     cat("checking ", probeData_and_mongo_data_names[[i]], "\n")

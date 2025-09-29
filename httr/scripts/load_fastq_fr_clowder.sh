@@ -1,3 +1,4 @@
+echo "running Clowder download"
 
 declare -A clowderVals
 while IFS='|' read -r key value; do
@@ -7,6 +8,7 @@ done < "clowderValues"
 cd ..
 
 cd $FASTQ_DATA_LOCATION
+
   declare -a fastqs=("TC00283209_K19" "TC00283209_F02" "TC00283209_E07" "TC00283209_C07" "TC00283171_L10" "TC00283171_J02" "TC00283171_H13" "TC00283171_C09" "TC00283151_D21" "TC00283151_C16" )
  
   declare -a ext=(".fastq_0" ".fastq_1" ".fastq_2")
@@ -26,5 +28,6 @@ cd $FASTQ_DATA_LOCATION
       fi
     done
   done
+  
   
   cd ../../../..

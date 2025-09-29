@@ -282,11 +282,12 @@ unit_test <- function(result_1, result_2, tolerance){
 }
 
 
-DESeq2_cut <- function(saved_results, treatments){
+DESeq2_cut <- function(saved_results, treatments, debug=getOption("debug",default=FALSE)){
 #' DESeq2_cut- (compartmentalized unit test) - test whether a localled generated DESeq2 result matches the the saved result
 #'
 #' @param saved_results (\emph{list}) = object with archived DESeq2 results and all necessary objects to recreate that object with local instalation
 #' @param treatments (d\emph{ata.frame}) = dataframe containing information about the analysis parameters that went into calculating DESeq2 results (shrinkage, normalization)
+#' @param debug (\emph{logical}) = Whether or not to report extra debug messages, overriden with options(debug=...)
 #' @export DESeq2_cut
 #' @return (\emph{boolean}) = if all tests pass, returns true, if *any* fail, returns false
   
@@ -304,7 +305,6 @@ DESeq2_cut <- function(saved_results, treatments){
   #iterate through rows in treatment dataframe
   for (i in 1:length(treatments[,1])){
     
-    debug=getOption("debug",default=FALSE)
     
     #generate a result for this set of parameters
     live_result <- runDESeq2(COUNTS = saved_results[[i]]$COUNTS, CONDS = saved_results[[i]]$CONDS, ref_level=saved_results[[i]]$ref_level, plate_effect=treatments[i,]$plate_effect,   shrinkage=as.character(treatments[i,]$shrinkage), threads=5, debug=debug)

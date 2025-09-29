@@ -13,7 +13,7 @@ For pipelining new data, both python 3 and R are required on a Linux-based syste
 ### R
 
 All R code in this pipeline has been encapsulated in the R package `httrlib` contained within this repository.
-All R code has been tested on R 3.6.0, but any version of R 3.x or 4.x should be compatible,
+All R code has been tested on R 4.4.1, but any version of R 4.x should be compatible,
 ***except*** with regards to controlling the version of `DESeq2` noted below.
 However, differences between versions of other R package dependencies may impact certain aspects of the pipeline due to changes in functionality or API.
 
@@ -25,7 +25,7 @@ The following R packages are required to pull existing HTTr data from MongoDB:
 Additional R packages are required to support pipelining of new HTTr data:
 
 + [reldist](https://cran.r-project.org/web/packages/reldist/index.html) - Required for computing Gini coefficients when applying QC checks on Level 1 count data, code has been tested with v1.6-6 of this package.
-+ [DESeq2](https://bioconductor.org/packages/3.9/bioc/html/DESeq2.html) - Required for differential expression analysis, code has been tested and all published analysis run with v1.24.0 of this package, which is tied to R v3.6 and BioConductor v3.9.
++ [DESeq2](https://bioconductor.org/packages/3.9/bioc/html/DESeq2.html) - Required for differential expression analysis, code has been tested with v1.44.0 of this package, which is tied to R v4.4.1 and BioConductor v3.19.
 
 
 ### Python
@@ -181,6 +181,17 @@ python3 align_and_count.py (localpath)/path/to/example_config.json &> (localpath
 Version History
 ---------------
 
+**v0.7.7-public (9/29/25)**
+
++ Added `getRaw` R function to extract information from `httr_raw` collection at the level of samples or read groups
++ Updated to support DESeq2 v1.44.0 on R v4.4.1 and BioConductor 3.19
++ Changed DESeq2 functions to model plate effect by default
++ Added alternate source of data files for unit testing (Zenodo)
++ Improved DB credential management for R in httrlib
++ Function to generate metadata for GEO submissions now includes QC flags
++ Changed global options to match parameter names and standardized use of global options across functions
++ Minor bug fixes, performance improvements, and increased API consistency across functions
+
 **v0.7.6-public (10/22/24)**
 
 + `build_pytest_env_no_docker.sh` now adds to user's existing R library instead of creating a new location and starting fresh
@@ -191,7 +202,7 @@ Version History
 + Standardized parameters for specifying the host (`db_host`) and DB name (`db_name`)
 + Additional improvements to function documentation
 
-**v0.7.5-public (4/30/24)**
+**v0.7.5-public (4/29/24)**
 
 *This is an extensive update to the [previous pilot code released in 2020](https://github.com/USEPA/httrpl_pilot)*
 
@@ -204,13 +215,10 @@ Version History
 + Added extensive unit tests for both Python functions and R/DESeq2 functions to ensure reproducible results.
 + Added scripts to build and test complete environment for pipelining, using either `venv` or `Docker`.
 
-
-
-
 Contributors
 ------------
 
-+ **[Logan J. Everett](mailto:everett.logan@epa.gov)**
++ **Logan J. Everett**
 + **[Derik E. Haggard](mailto:haggard.derik@epa.gov)**
 + **Lionel Girardin**
 + **Imran Shah**
@@ -218,8 +226,10 @@ Contributors
 + **Beena Vallanat**
 + **Joshua Witten**
 
-
 Disclaimer
 ----------
 
-The United States Environmental Protection Agency (EPA) GitHub project code is provided on an "as is" basis and the user assumes responsibility for its use. EPA has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA. The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government.
+The United States Environmental Protection Agency (EPA) GitHub project code is provided on an "as is" basis and the user assumes responsibility for its use.
+EPA has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information.
+Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA.
+The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government.

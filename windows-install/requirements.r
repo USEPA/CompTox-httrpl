@@ -1,5 +1,5 @@
 library(BiocManager)
-BiocManager::install(version = "3.9", update = F, ask = F)
+BiocManager::install(version = "3.19", update = F, ask = F)
 remove.packages('RcppEigen')
 BiocManager::install('DESeq2',ask=FALSE)
-if (packageVersion('DESeq2') == '1.24.0') print("DESeq2 VERSION IS 1.24.0 !") else print("PROBLEM: DESeq2 VERSION IS NOT 1.24.0 !")
+if (packageVersion('DESeq2') == '1.44.0') print("DESeq2 VERSION IS 1.24.0 !") else print("PROBLEM: DESeq2 VERSION IS NOT 1.44.0 !")

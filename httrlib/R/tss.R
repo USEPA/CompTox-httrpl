@@ -41,7 +41,7 @@ tss_deg_count <- function(
 #' @param pval_col (\emph{character}) = Name of pvalue column, defaults to "pvalue" to match DESeq2 output format, only matters if pval is specified
 #' @param rank_col (\emph{character}) = Which column to use for ranking the top/bottom N probes, defaults to l2fc_col but can rank by e.g. pval or SNR metric
 #' @param rank_dir (\emph{character}) = Whether to use the top N, bottom N, or both top/bottom N when computing L2 Norm, defaults to both
-#' @param debug (\emph{logical}) = Whether to print debug messages
+#' @param debug (\emph{logical}) = Whether to print debug messages, can be set using options(debug=...)
 #' @export tss_l2_norm
 #' @return (\emph{numeric}) = The euclidean L2 norm of the top/bottom n l2fc values
 

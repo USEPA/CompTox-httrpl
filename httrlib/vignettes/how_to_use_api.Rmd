@@ -43,6 +43,8 @@ fill in your id/password to your sandbox db
 
 2.1: getCredentials:
 
+2.1.1: legacy way
+
 getCredentials <- function(host=getOption("httrDefaultHost"), db=NULL)
 
 Rather than loading entire keychains into memory, it just quickly scans ~/.mongopw and ~/.mngdb/passwd for relevant user,passwd combo
@@ -51,6 +53,31 @@ Returns NULL or a list with members user,passwd (and host,db if specified)
 example of usage:
 
 mycred <- getCredentials('mongo_server','mydb')
+
+2.1.2: use the Keychain class (preferred)
+
+create a keychain instance that will give you ways to load/add/find credentials from your .mongopw file:
+
+example of usage:
+
+kc <- Keychain$new()
+
+methods available are: 
+
+kc$findKey(host,db)
+kc$getCredentials(db_host, db_name)
+kc$addKey(host, db, user, passwd, authSource = NULL, authMechanism = NULL)
+
+and function: addKeychainEntry(host = NULL,
+  db = NULL,
+  user = NULL,
+  passwd = NULL,
+  authSource = NULL,
+  authMechanism = NULL,
+  keyfile = DEFAULT_KEYCHAIN,
+  interactive = FALSE)
+  
+  
 
 2.2: mongoURL:
 

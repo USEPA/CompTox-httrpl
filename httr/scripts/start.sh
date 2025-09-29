@@ -5,7 +5,7 @@ cd /httr/scripts
 
 echo $PYTEST 
 
-./load_fastq_fr_clowder.sh
+./load_fastq.sh
 
 if [ $PYTEST == "Y" ]
 then

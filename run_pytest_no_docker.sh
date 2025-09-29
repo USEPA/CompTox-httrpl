@@ -1,3 +1,4 @@
+
 . ~/.bashrc
 
 . venv_httr_app/bin/activate
@@ -20,8 +21,10 @@ export MONGOPW_FILE=~/.mongopw
 
 export PARALLEL_CORES=3 #0 or absent means don't run in parallel
 
+export LOAD_FROM=Clowder
+
 cd httr/scripts
-./load_fastq_fr_clowder.sh
+./load_fastq.sh
 
 cd ..
 pytest
@@ -39,3 +42,4 @@ fi
 cd ../..
 
 Rscript RTesting/DESeq2/DESeq2_compartmentalized_unit_test.R 
+Rscript RTesting/validateProbeManifest/unit_validateProbeManifest.R

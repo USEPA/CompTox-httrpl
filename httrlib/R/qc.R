@@ -3,18 +3,18 @@
 #'
 #' @param counts (\emph{integer}) = a vector of counts for a single sample, w/ or w/out 0 counts
 #'  All of these statistics should be invariant to the probe labels, ordering of the counts, or whether 0 counts are missing
-#' @param ncov (\emph{integer}) = Minimum read count(s) for Ncov statistic (number of probes covered at a minimum read count level)
-#' @param nsig (\emph{numeric}) = Proportion of signal for Nsig statistic (minimum number of probes capturing top X% of signal)
-#' @param topn (\emph{integer}) = Number of probes to use for TopN statistic (proportion of signal captured by top probe)
+#' @param ncov (\emph{integer}) = Minimum read count(s) for Ncov statistic (number of probes covered at a minimum read count level), can be overridden with options(ncov=...)
+#' @param nsig (\emph{numeric}) = Proportion of signal for Nsig statistic (minimum number of probes capturing top X% of signal), can be altered with options(nsig=...)
+#' @param topn (\emph{integer}) = Number of probes to use for TopN statistic (proportion of signal captured by top probe), can be altered with options(topn=...)
 #' @export countStats
 #' @import foreach
 #' @return (\emph{named list}) = each of the requested statistics, member names now match DB schema
 
 countStats <- function(
   counts, 
-  ncov=getOption("httrStatNCov", default=5), 
-  nsig=getOption("httrStatNsig", default=0.8), 
-  topn=getOption("httrStatTopN", default=10)
+  ncov=getOption("ncov", default=5), 
+  nsig=getOption("nsig", default=0.8), 
+  topn=getOption("topn", default=10)
 ) {
 
   
@@ -27,7 +27,7 @@ countStats <- function(
 		names(nc) <- paste0("n_cov",ncov)
 		st <- append(st, nc)
 	}
-	# Drop probes w/ no reads (this is for efficiency, should not impact final Nsig values)
+	# Drop probes w/ no reads (this is for efficiency, should not impact final nsig values)
 	counts_nz <- counts[counts > 0]
 	# Sort in decreasing order
 	counts_nz <- sort(counts_nz, decreasing = T)
@@ -58,13 +58,13 @@ countStats <- function(
 #' If zero counts are missing, should specify proben to fill in missing 0s
 #' 
 #' @param counts (\emph{integer}) = a vector of counts for a single sample, w/ or w/out 0 counts
-#' @param proben (\emph{integer}) = Total number of probes used for Gini coefficients across samples, ignored if NULL
-#' @param debug (\emph{logical}) = Whether or not to report extra debug messages
+#' @param proben (\emph{integer}) = Total number of probes used for Gini coefficients across samples, ignored if NULL, can be changed by using options(proben=...)
+#' @param debug (\emph{logical}) = Whether or not to report extra debug messages, can be set with options(debug=...)
 #' @export countGini
 #' @return (\emph{numeric}) = Gini coefficient returned from reldist::gini
 
 
-countGini = function(counts, proben=getOption("httrProbeN"), debug=getOption("debug",default=FALSE)) {
+countGini = function(counts, proben=getOption("proben",NULL), debug=getOption("debug",default=FALSE)) {
   if (!requireNamespace("reldist", quietly = TRUE)) {
     stop(
       "Package \"reldist\" must be installed to use this function.",
@@ -105,7 +105,7 @@ countGini = function(counts, proben=getOption("httrProbeN"), debug=getOption("de
 #' @param max_top10_prop (\emph{numeric}) = maximum top10_prop, flag with HIGH_TOP10 above this cutoff
 #' @param max_gini_coef (\emph{numeric}) = maximum gini_coef, flag with HIGH_GINI above this cutoff
 #' @param qc_flags (\emph{character vector}) = list of flags to apply in priority order
-#' @param debug (\emph{logical}) = Whether to report some debug info
+#' @param debug (\emph{logical}) = Whether to report some debug info, can be set using options(debug=...)
 #' @export countQCflag 
 #' @return (\emph{character}) = a single QC flag for the well, "OK" if not thresholds were hit
 
@@ -155,17 +155,17 @@ countQCflag <- function(
 #' 
 #' @param counts_doc (\emph{list}) = Follows DB schema for httr_counts, msut include the _id field
 #' @param bad_probes (\emph{character vector}) = List of probe IDs that should be masked
-#' @param proben (\emph{integer}) = Total number of probes on the platform (length bad_probes will be subtracted before passing to gini function)
-#' @param calc_gini (\emph{logical}) = Whether or not to calculate gini, default True but can override if no reldist package installed
+#' @param proben (\emph{integer}) = Total number of probes on the platform (length bad_probes will be subtracted before passing to gini function) defaults to NULL, , can be set using options(proben=...)
+#' @param calc_gini (\emph{logical}) = Whether or not to calculate gini, default True but can override if no reldist package installed, can be set using options(calc_gini=...)
 #' @param calc_flag (\emph{logical}) = Whether or not to calculate qc_flag, default True but when set to False all flags will be set to "OK"
-#' @param debug (\emph{logical}) = Whether to report additional debug info
+#' @param debug (\emph{logical}) = Whether to report additional debug info, can be overriden with options(debug=...)
 #' @export countQC
 
 countQC <- function(
   counts_doc, 
   bad_probes=c(), 
-  proben=getOption("httrProbeN"), 
-  calc_gini=getOption("httrStatGini", default=TRUE),
+  proben=getOption("proben",default=NULL), 
+  calc_gini=getOption("calc_gini", default=TRUE),
   calc_flag=TRUE,
   min_mapd_frac = get_global_option("min_mapd_frac"),
   min_n_reads_mapd = get_global_option("min_n_reads_mapd"),
@@ -257,16 +257,31 @@ outerFences <- function(x, iqr.factor = 3) {
 #' NOTE: When the relevant flag is not in httrQCflags, this will always return NULL
 #'
 #' @param qc_metric (\emph{character}) = Name of the QC metric to get default for
+#' @param min_mapd_frac (n\emph{numeric}) = minimum mapd_frac, flag with LOW_MAPD_FRAC below this cutoff
+#' @param min_n_reads_mapd (\emph{integer}) = minimum n_reads_mapd, flag with LOW_READS below this cutoff
+#' @param min_n_sig80 (\emph{integer}) = minimum n_sig80, flag with LOW_NSIG80 below this cutoff
+#' @param min_n_cov5 (\emph{integer}) = minimum n_cov5, flag with LOW_NCOV5 below this cutoff
+#' @param max_top10_prop (\emph{numeric}) = maximum top10_prop, flag with HIGH_TOP10 above this cutoff
+#' @param max_gini_coef (\emph{numeric}) = maximum gini_coef, flag with HIGH_GINI above this cutoff
+
 #' @export getQCdefault
 #' @return (\emph{numeric}) = Value of default threshold, or NULL if not thresholding on this metric
 #'
-getQCdefault <- function(qc_metric) {
+getQCdefault <- function(qc_metric, 
+                         min_mapd_frac=get_global_option("min_mapd_frac"),
+                         min_n_reads_mapd=getOption("min_n_reads_mapd"),
+                         min_n_sig80=get_global_option("min_n_sig80"),
+                         min_n_cov5=get_global_option("min_n_cov5"),
+                         max_top10_prop=get_global_option("max_top10_prop"),
+                         max_gini_coef=get_global_option("max_gini_coef")) {
+                         
   if((qc_metric == "mapd_frac") && ("LOW_MAPD_FRAC" %in% get_global_option("qc_flags"))) {
-    return(get_global_option("min_mapd_frac"))
+    #return(get_global_option("min_mapd_frac"))
+    return(min_mapd_frac)
   }
   # Return read depth threshold for both total reads and mapd, +/- log10 scale conversion
   if((qc_metric %in% c("n_reads", "n_reads_mapd", "log10_n_reads", "log10_n_reads_mapd")) && ("LOW_READS" %in% get_global_option("qc_flags"))) {
-    cutoff <- getOption("min_n_reads_mapd")
+    cutoff <- min_n_reads_mapd
     if((qc_metric %in% c("log10_n_reads", "log10_n_reads_mapd")) && !is.null(cutoff)) {
       return(log10(cutoff))
     } else {
@@ -275,16 +290,16 @@ getQCdefault <- function(qc_metric) {
   }
     
   if((qc_metric == "n_sig80") && ("LOW_NSIG80" %in% get_global_option("qc_flags"))) {
-    return(get_global_option("min_n_sig80"))
+    return(min_n_sig80)
   }
   if((qc_metric == "n_cov5") && ("LOW_NCOV5" %in% get_global_option("qc_flags"))) {
-    return(get_global_option("min_n_cov5"))
+    return(min_n_cov5)
   }
   if((qc_metric == "top10_prop") && ("HIGH_TOP10" %in% get_global_option("qc_flags"))) {
-    return(get_global_option("max_top10_prop"))
+    return(max_top10_prop)
   }
   if((qc_metric == "gini_coef") && ("HIGH_GINI" %in% get_global_option("qc_flags"))) {
-    return(get_global_option("max_gini_coef"))
+    return(max_gini_coef)
   }
   return(NULL)
 }

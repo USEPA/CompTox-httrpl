@@ -61,6 +61,7 @@ pip install celery
 
 cp ~/.mongopw .
 
+
 export HTTR_CELERY_MP=Y
 
 wget -nv -O redis-stable.tar.gz http://download.redis.io/redis-stable.tar.gz

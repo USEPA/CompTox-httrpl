@@ -801,13 +801,10 @@ readWellTrtFile <- function(sampleID_file){
 #' @param Target Chem Collection: (\emph{character}) targetChem defaulting to httr_chem
 #' @param status: (\emph{numeric}) whether of not we keep prior data if found in target collection (status="KEEP"), erase all items in collection (status="RERUN"), or just replace the sampleIDs found (status="REPLACE")
 #'
-#' @param skipped_tests: (\emph{character vector}) list of tests that are excluded
 #' @param db_host: (\emph{character}) mongo url with or without port
 #' @param db_name: (\emph{character}) mongo database or sandbox
 #' @param validate: (\emph{character}) boolean if TRUE (default) will run the validate function on wellTrt
-#' @param max_dose_level (float) the highest dose level for any conc-response curve - knowing the intended number of points in each conc-response curve is useful
-#' @param required_cols: (\emph{character vector}) a list of required columns to be found in the wellTrt data.table
-#' @param extra_cols: (\emph{character vector}) a list of additional columns for which there may be a test
+#' @param ...: additional non explicit parameters that will be passed to validate_httr_well_trt_schema function - look up thid functions or details
 #' @import data.table
 #' @return nothing explicit
 #'
@@ -822,7 +819,7 @@ readWellTrtFile <- function(sampleID_file){
 #' @export sampleID_wrapper
     
 
-sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem", status="KEEP", skipped_tests=c(), db_host=NULL, db_name=NULL, validate=TRUE, max_dose_level = 8, required_cols = c("sample_id", "plate_id", "well_id", "trt_name", "qc_flag"), extra_cols = c(), output_dir = "", ...){
+sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem", status="KEEP", db_host=NULL, db_name=NULL, validate=TRUE, output_dir = "", ...){
 
 
   if (missing(wellTrt)){
@@ -846,7 +843,7 @@ sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, ta
 
   results <- list()
   if (validate == TRUE)
-    results = validate_httr_well_trt_schema(wellTrt, skipped_tests, required_cols = required_cols, extra_cols = extra_cols, ...)
+    results = validate_httr_well_trt_schema(wellTrt, ...)
 
   if (length(results) != 0)
     print(results)
@@ -925,10 +922,10 @@ sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, ta
 #' @param sampleID_file: (\emph{character}) new vs of that files with some edits - regardless where the edits took place
 #' @param targetWellTrtCol: (\emph{character}) target collection where the updates will be written to - by default httr_well_trt
 #' @param targetChem: (\emph{character}) the target Chem collection where some updates will be written to - by default httr_chem
-#' @param skipped_tests: (\emph{character vector}) the list of tests to skip when validating the resulting set of data
 #' @param db_host: (\emph{character}) mongo db server +- port
 #' @param db_name: (\emph{character}) mongo db database
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
+#' @param ...: additional non explicit parameters that will be passed to validate_httr_well_trt_schema and sampleID_wrapper functions - look up these functions for details
 #'
 #' process:
 #'     The function does a diff on the two files and calls sampleID_wrapper() on that resulting list of modified sampleIds
@@ -941,7 +938,7 @@ sampleID_wrapper <- function(wellTrt=NULL, chemInfo=NULL, sampleID_file=NULL, ta
 #' @export sampleID_scan_and_update
 
 
-sampleID_scan_and_update <- function(orig_sampleID_file=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem", skipped_tests=skipped_tests, db_host, db_name, output_dir = "", ...){
+sampleID_scan_and_update <- function(orig_sampleID_file=NULL, sampleID_file=NULL, targetWellTrtCol="httr_well_trt", targetChem = "httr_chem",db_host, db_name, output_dir = "", ...){
 
   wellTrt <- readWellTrtFile(sampleID_file)
   wellTrt <- as.data.table(wellTrt)
@@ -949,7 +946,7 @@ sampleID_scan_and_update <- function(orig_sampleID_file=NULL, sampleID_file=NULL
   
   results <- list()
   
-  results = validate_httr_well_trt_schema(wellTrt, skipped_tests, ...)
+  results = validate_httr_well_trt_schema(wellTrt, ...)
   if (length(results) != 0){
       print(results)
   }
@@ -971,7 +968,7 @@ sampleID_scan_and_update <- function(orig_sampleID_file=NULL, sampleID_file=NULL
     chemInfo <- process_chemInfo(diff_rows.new)
     diff_rows.new <- process_chem_columns(diff_rows.new)
   
-    sampleID_wrapper(diff_rows.new, chemInfo = chemInfo, status="REPLACE", skipped_tests=skipped_tests, db_host = db_host, db_name = db_name, validate = FALSE, output_dir = output_dir, ...)
+    sampleID_wrapper(diff_rows.new, chemInfo = chemInfo, status="REPLACE", db_host = db_host, db_name = db_name, validate = FALSE, output_dir = output_dir, ...)
 
   }
 }

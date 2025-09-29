@@ -17,10 +17,7 @@
 
 getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character(0), procFile=' ', vehicle_control = "DMSO", cell_line = NULL, output_dir="", ...){
 
-  def_collections <- c("httr_well_trt", "httr_well", "httr_chem", "httr_raw")
-  def_collections <- setdiff(def_collections, names(collections))
-  names(def_collections) <- def_collections
-  collections <- c(collections, def_collections)
+  collections <- check_collection_remapped(collections)
 
   #open DB connections
   DB_well <- openMongo(db_host=db_host, db_name=db_name, collection = collections["httr_well"], output_dir=output_dir)
@@ -217,8 +214,8 @@ getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character
   GEO_metadata <- merge(GEO_metadata, raw[, 2:3], by = "sample_id")
   GEO_metadata[, `raw data file` := fastq]
 
-  #Clean up metadata to have columns of interest only
-  GEO_metadata <- GEO_metadata[, which((names(GEO_metadata) %in% GEO_columns)==TRUE), with = FALSE]
+  #Clean up metadata to have columns of interest only -- adding qc_flag as well
+  GEO_metadata <- GEO_metadata[, which((names(GEO_metadata) %in% c(GEO_columns, "qc_flag"))==TRUE), with = FALSE]
 
   #Return the formatted data table
   return(GEO_metadata)
@@ -248,10 +245,7 @@ getGeoMetadata <- function(db_host = NULL, db_name = NULL, collections=character
 
 getSRAMetadata <- function(db_host= NULL, db_name = NULL, title = "", collections=character(0), library_strategy = "RNA-seq", library_source = "TRANSCRIPTOMIC", library_selection="cDNA", library_layout="Single", platform="ILLUMINA", instrument_model= "", design_description= "",  filetype="fastq", output_dir="", ...){
 
-  def_collections <- c("httr_well", "httr_raw")
-  def_collections <- setdiff(def_collections, names(collections))
-  names(def_collections) <- def_collections
-  collections <- c(collections, def_collections)
+  collections <- check_collection_remapped(collections)
 
   #open DB connections
   DB_well <- openMongo(db_host=db_host, db_name=db_name, collection = collections["httr_well"], output_dir=output_dir)
@@ -382,10 +376,7 @@ getSRAMetadata <- function(db_host= NULL, db_name = NULL, title = "", collection
 
 getSRABioSampleMetadata <- function(db_host = NULL, db_name = NULL, collections=character(0), Organism = 'Homo sapiens', Isolate = 'not applicable', Age = 'not applicable', biomaterial_provider = 'US EPA,109 T.W. Alexander Drive, Durham, NC, 27709', collection_date = 'not applicable', geo_loc_name = 'USA: Durham, North Carolina', Sex = 'not applicable', Tissue = 'not applicable', vehicle_control = 'DMSO', Cell_line = NULL, output_dir="", ...){
 
-  def_collections <- c("httr_well_trt", "httr_well", "httr_chem", "httr_raw")
-  def_collections <- setdiff(def_collections, names(collections))
-  names(def_collections) <- def_collections
-  collections <- c(collections, def_collections)
+  collections <- check_collection_remapped(collections)
 
   #open DB connections
   DB_well <- openMongo(db_host=db_host, db_name=db_name, collection = collections["httr_well"], output_dir=output_dir)
@@ -543,6 +534,67 @@ getSRABioSampleMetadata <- function(db_host = NULL, db_name = NULL, collections=
   #Return the formatted data table
   return(BioSample_metadata)
 }
+
+
+
+#' getRaw
+#'
+#' @param db_host character string: the address of the database being used
+#' @param db_name character string: the name of the database being used
+#' @param collapseReadGrps logical: if TRUE, the number of read_grps rows in substructure should be stored in n_read_grps, and the rest of the coliumns of read_grps discarded, 
+#' if FALSE the columns in the substructure stored in read_grps should be flattened with the read_grps columns repeated accross all rows 
+#'
+#' @importFrom tibble as_tibble
+#' @importFrom purrr map map_dfr
+#' @importFrom dplyr bind_cols bind_rows
+#' @export getRaw
+#'
+#' @return dataframe with the httr_raw data
+
+getRaw <- function(db_host = NULL, db_name = NULL, collapseReadGrps = FALSE, output_dir="", ...){
+
+  
+  DB_raw <- openMongo(db_host=db_host, db_name=db_name, collection = "httr_raw", output_dir=output_dir)
+  
+  query <- mongoQuery(...)  
+
+  documents <- DB_raw$find(query=query)  
+  
+  flatten_data <- function(documents){
+  
+    flat_list <- map(1:nrow(documents), function(i){
+      row <- documents[i,]
+      
+      if (!is.null(row$read_grps[[1]])){
+        aggregated_rows <- map_dfr(row$read_grps, ~bind_cols(row[setdiff(names(row), "read_grps")], .))
+      } else{
+        aggregated_rows <- as_tibble(row[setdiff(names(row), "read_grps")])
+      }
+      aggregated_rows  
+  
+    })
+    result<- bind_rows(flat_list)
+    return(result)
+
+  }
+  
+  process_data <- function(documents){
+    documents$n_read_grps <- sapply(documents$read_grps, function(x) if (is.null(x)) 0 else nrow(x))
+    documents <- documents[ , !(names(documents) %in% "read_grps")]
+    return(documents)
+  
+  }
+  
+  if (collapseReadGrps == FALSE){
+    result <- flatten_data(documents)
+  } else{
+    result <- process_data(documents)
+  }
+  return(result)
+}
+
+
+
 
 
 

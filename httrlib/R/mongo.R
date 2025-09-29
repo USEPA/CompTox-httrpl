@@ -52,7 +52,7 @@ check_collection_exists <- function (db_host, db_name, collection, output_dir = 
 #' openMongo 
 #' open a connection to a specific collection in a mongo db
 #'
-#' @param db_host (\emph{character})
+#' @param db_host (\emph{character}) defaults to NULL can be changed by using options
 #' @param user (\emph{character})
 #' @param passwd (\emph{character})
 #' @param db_name (\emph{character})
@@ -68,8 +68,8 @@ check_collection_exists <- function (db_host, db_name, collection, output_dir = 
 # @examples url=mongoURL(db_host=db_host, user=user, passwd=passwd, db_name=db_name, collection=NULL, authSource = authSource, authMechanism = NULL)
 
 
-openMongo <- function(db_host=getOption("DB_HOST"), user=NULL, passwd=NULL, 
-  db_name=NULL, collection=NULL, authSource = NULL, authMechanism = NULL, check_collection_present=FALSE, output_dir = "", verbose = FALSE) {
+openMongo <- function(db_host=getOption("DB_HOST",default=NULL), user=NULL, passwd=NULL, 
+  db_name=NULL, collection=NULL, authSource = NULL, authMechanism = NULL, check_collection_present=FALSE, output_dir = "", verbose = getOption("verbose",FALSE)) {
 
   #let's read the mongo/nomongo global variable value
   if (output_dir == "")
@@ -106,7 +106,7 @@ openMongo <- function(db_host=getOption("DB_HOST"), user=NULL, passwd=NULL,
     
     # Open the mongo connection
   
-    return(mongo(collection=collection, url=mongoURL(db_host=db_host, user=user, passwd=passwd, db_name=db_name, authSource = authSource), verbose=getOption("verbose")))
+    return(mongo(collection=collection, url=mongoURL(db_host=db_host, user=user, passwd=passwd, db_name=db_name, authSource = authSource), verbose=verbose))
   }
 }
 
@@ -230,7 +230,7 @@ splitIDs <- function(DB, ids, id_field="sample_id") {
 #' @param ids (\emph{vector}) = Vector (usually character) of IDs for documents to delete, default=c(), which defers to delete_all
 #' @param id_field (\emph{character}) = Alternate ID field to use, default: "sample_id"
 #' @param delete_all (\emph{logical}) = Setting to True will delete the whole collection, default: False
-#' @param debug (\emph{logical}) = Whether to post debug messages
+#' @param debug (\emph{logical}) = Whether to post debug messages, can also set using options(debug=True)
 #' 
 #' @return (\emph{numeric}) = Number of documents that were deleted, will also warn if != length(ids) when delete_all=False
 #' @export deleteByID
@@ -275,7 +275,7 @@ deleteByID <- function(DB, ids=c(), id_field="sample_id", delete_all=FALSE, debu
 #' @param docs (\emph{list}) = List of documents to insert into collection
 #' @param id_field (\emph{character}) = The field to use for matching up documents, default: sample_id
 #' @param rerun (\emph{logical}) = Whether to overwrite existing data with same sample_id
-#' @param debug (\emph{logical}) = Whether to report debug messages
+#' @param debug (\emph{logical}) = Whether to report debug messages, can also set using options(debug=True)
 #' @import mongolite
 #' @return (\emph{integer}) = The number of documents successfully inserted, 
 #'  Note: Unlike the pymongo API, mongolite does not return the IDs after a successful insert

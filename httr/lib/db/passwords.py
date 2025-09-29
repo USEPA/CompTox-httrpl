@@ -169,12 +169,27 @@ class Keychain:
 
         k = self.findKey(host, db)
         return None if k == -1 else self.keylist[k].copy()
+        
+    def swapPort(self, host):
+        """
+        small utility to remove port from host if there or add it if not
+        Parameters:
+        host (str): The mongoDB host
+        Returns: the host+port or host-port
+        """
+        if "27017" in host:
+            host = host[:-6]
+        else:
+            host += ":27017"
+        return host 
 
     def findKey(self, host, db):
         """
         Find the index of specific key matching host,db pair in the keychain.
 
         Search keychain.keylist for any entry matching host and db, return the index of first entry found.
+        
+        we first look for an exact match, if not found, we look for a matched host and '*' for db
 
         Parameters:
         host (str): The mongoDB host
@@ -184,20 +199,14 @@ class Keychain:
         (int) = Index of first matching key, or -1 if not found.
         """
         # TO DO: Should this function be internal to the class?
-        for i in range(0, len(self.keylist)):
-            key = self.keylist[i]
-            if (key['host'] == host) and (key['db'] == db):
-                return i
-
-        # we're here because of failure
-        if "27017" in host:
-            host = host[:-6]
-        else:
-            host += ":27017"
-        for i in range(0, len(self.keylist)):
-            key = self.keylist[i]
-            if (key['host'] == host) and (key['db'] == db):
-                return i
+                
+        for db_name in (db, "*"):     
+            for host_name in (host, self.swapPort(host)):     
+                for i in range(0, len(self.keylist)):
+                    key = self.keylist[i]
+                    if (key['host'] == host_name) and (key['db'] == db_name):
+                        return i
+        
         return -1
 
     def addKey(

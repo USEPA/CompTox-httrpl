@@ -18,6 +18,7 @@
 #' @param min_n_cov5 (\emph{integer}) = minimum n_cov5, flag with LOW_NCOV5 below this cutoff
 #' @param max_top10_prop (\emph{numeric}) = maximum top10_prop, flag with HIGH_TOP10 above this cutoff
 #' @param max_gini_coef (\emph{numeric}) = maximum gini_coef, flag with HIGH_GINI above this cutoff
+#' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
 #' in the ... param, a query can be passed that will select the documents in httr_well_trt used to further filter 
 #' the sample_ids to run the qc_flag calculation and storage in the httr_counts_qc collection
@@ -136,7 +137,7 @@ qcBatch <- function(db_host, db_name,
 #' @param max_gini_coef (\emph{numeric}) = maximum gini_coef, flag with HIGH_GINI above this cutoff
 #' @param qc_flags (\emph{character vector}) = list of flags to apply in priority order
 #' @param output_dir (\emph{character}) = used to overwrite the global of same name to indicate mongo or Json file used as data repository
-#' @param debug (\emph{logical}) = Whether to report debug messages
+#' @param debug (\emph{logical}) = Whether to print debug messages, default: FALSE, overridden by options(debug=...)
 #' @export updateqcFlags
 #' @return nothing explicitly
 

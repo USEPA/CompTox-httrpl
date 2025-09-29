@@ -1,13 +1,13 @@
 #' getAnlName
 #' Convert analysis options to standardized anl_name for httr_deg docs
-#' @param mean_cnt (\emph{numeric})
+#' @param mean_cnt (\emph{numeric}) default: 5 can be set using options(mean_cnt=...)
 #' @param plate_effect (\emph{character})
 #' @param shrinkage (\emph{character})
 #' @param ... = Additional parameters to be used and incorporated into the generated name
 #' @export getAnlName
 #' @return concatenated string including each passed parameter name and value separated by '_'
 
-getAnlName <- function(mean_cnt=getOption("mean_cnt"), plate_effect=F, shrinkage="normal", ...) {
+getAnlName <- function(mean_cnt=getOption("mean_cnt",default=5), plate_effect=F, shrinkage="normal", ...) {
   extra_opts <- list(...)
   anl_name <- sprintf("meanncnt0_%i-plateteffect_%i-shrinkage_%s", mean_cnt, plate_effect, shrinkage)
   for(x in names(extra_opts)) {
@@ -352,7 +352,7 @@ getDEGs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_deg",
 #' @param db_name (\emph{character}) = Specifies the DB name to connect to
 #' @param collections (\emph{named character vector}) = Optional vector to re-map collection names used, where name=default collection; value=new collection name
 #' @param anl_name (\emph{character}) = Which analysis configuration to pull results for, default: based on mean_cnt, plate_effect, and shrinkage params, but setting here takes precedence
-#' @param mean_cnt (\emph{integer}) = passed to getAnlName to set anl_name, default: 5
+#' @param mean_cnt (\emph{integer}) = passed to getAnlName to set anl_name, default: 5, overriden by options(mean_cnt=...)
 #' @param plate_effect (\emph{logical}) = passed to getAnlName to set anl_name, default: T
 #' @param shrinkage (\emph{character}) = passed to getAnlName to set anl_name, default: "normal"
 #' @param stype (\emph{character}) = Filter for sample type, set to NULL to remove this filter, default: "test sample"
@@ -366,7 +366,7 @@ getDEGs <- function(DB=NULL, db_host=NULL, db_name=NULL, collection="httr_deg",
 
 getFCmatrix <- function(db_host, db_name, collections=character(0), 
                         anl_name=getAnlName(mean_cnt=mean_cnt, plate_effect=plate_effect, shrinkage=shrinkage), 
-                        mean_cnt=getOption("mean_cnt"), plate_effect=T, shrinkage="normal",
+                        mean_cnt=getOption("mean_cnt",default=5), plate_effect=T, shrinkage="normal",
                         stype="test sample", debug=getOption("debug",default=FALSE),threads=-1,
                         output_dir = "", ...
 ) {
@@ -405,10 +405,7 @@ getFCmatrix <- function(db_host, db_name, collections=character(0),
 
   }
   
-  def_collections <- c("httr_deg", "httr_chem")
-  def_collections <- setdiff(def_collections, names(collections))
-  names(def_collections) <- def_collections
-  collections <- c(collections, def_collections)
+  collections <- check_collection_remapped(collections)
   
   # Pull all DEG results matching anl_name, stype, and any additional query terms specified
   deg_dump <- getDEGs(db_host=db_host, db_name=db_name, collection=collections["httr_deg"], 

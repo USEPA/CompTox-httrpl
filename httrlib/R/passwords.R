@@ -65,7 +65,7 @@ defaultLogin <- function(pwfile = DEFAULT_PASSWD) {
 #' For `addKey` and `save`, no return value (invisible NULL).
 #'
 #' @importFrom jsonlite fromJSON toJSON
-#' @import R6
+#' @importFrom R6 R6Class
 #' @import getPass
 #' @export
 Keychain <- R6Class("Keychain",

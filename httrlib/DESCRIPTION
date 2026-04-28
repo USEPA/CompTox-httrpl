@@ -79,4 +79,5 @@ Imports:
     stringr,
     dplyr,
     purrr,
-    testthat
+    testthat,
+    R6
